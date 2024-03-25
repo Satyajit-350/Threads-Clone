@@ -30,8 +30,8 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 fun HomeScreen(
-navHostController: NavHostController,
-homeViewModel: HomeScreenViewModel = hiltViewModel()
+    navHostController: NavHostController,
+    homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
@@ -45,7 +45,7 @@ homeViewModel: HomeScreenViewModel = hiltViewModel()
     }
 
     LaunchedEffect(refreshing) {
-        if(refreshing){
+        if (refreshing) {
             delay(1000)
             refreshing = false
         }
@@ -69,18 +69,21 @@ homeViewModel: HomeScreenViewModel = hiltViewModel()
                 getAllThreadsResult?.let { result ->
                     when (result) {
                         is NetworkResult.Success -> {
-                            ListContent(items = result.data!!, navHostController = navHostController)
+                            ListContent(
+                                items = result.data!!,
+                                navHostController = navHostController
+                            )
                             isLoading = false
                         }
+
                         is NetworkResult.Error -> {
                             Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
                             isLoading = false
                         }
+
                         is NetworkResult.Loading -> {
                             isLoading = true
                         }
-
-                        else -> {}
                     }
                 }
             }
@@ -93,7 +96,7 @@ homeViewModel: HomeScreenViewModel = hiltViewModel()
                 )
             }
         }
-        
+
     }
 
 }

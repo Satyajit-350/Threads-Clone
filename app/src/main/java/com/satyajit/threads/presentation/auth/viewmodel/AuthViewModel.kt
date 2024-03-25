@@ -38,7 +38,7 @@ class AuthViewModel @Inject constructor(
         email: String,
         username: String,
         name: String,
-        imageUri: Uri,
+        imageUri: Uri?,
         phone:String,
         bio: String,
         location: String,

@@ -35,8 +35,10 @@ class SearchRepository @Inject constructor(
             val response = firebaseFireStore.collection("Users").get().await()
             if (!response.isEmpty) {
                 response.documents.forEach { user ->
-                    val users = user.toObject(User::class.java)
-                    usersList.add(users!!)
+                    val userData = user.toObject(User::class.java)
+                    if(userData?.userId != firebaseAuth.currentUser?.uid){
+                        usersList.add(userData!!)
+                    }
                 }
                 Log.d("AllUser", "getAllUsers: $usersList")
                 _usersLiveData.postValue(NetworkResult.Success(usersList))

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
@@ -38,7 +37,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,7 +59,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -115,7 +112,7 @@ fun EditProfileScreen(
         } else {
             Toast.makeText(
                 context,
-                "Permission Not Granted!! Please grant permisssion",
+                "Permission Not Granted!! Please grant permission",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -207,7 +204,6 @@ fun EditProfileScreen(
                         containerColor = Color.White
                     )
                 ) {
-
                     Box(modifier = Modifier.padding(10.dp)) {
                         Column {
                             Row(
@@ -294,7 +290,6 @@ fun EditProfileScreen(
                                             }
                                         }
                                 )
-
                             }
                             Divider(
                                 modifier = Modifier
@@ -306,9 +301,7 @@ fun EditProfileScreen(
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .clickable {
-                                        if (SharedPref.getBio(context) == "") {
-                                            navHostController.navigate(Routes.EditBio.route)
-                                        }
+                                        navHostController.navigate(Routes.EditBio.route)
                                     }
                             ) {
                                 Text(
@@ -480,7 +473,7 @@ fun EditProfileScreen(
                             "",
                             SharedPref.getUserName(context),
                             SharedPref.getName(context),
-                            imageUri!!,
+                            imageUri,
                             "",
                             SharedPref.getBio(context),
                             "",

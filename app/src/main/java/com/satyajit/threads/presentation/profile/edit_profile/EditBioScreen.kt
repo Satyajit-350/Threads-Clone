@@ -119,10 +119,7 @@ fun EditBioScreen(
                 }
             }
         }
-
-
     }
-
 }
 
 //@Preview(showBackground = true)

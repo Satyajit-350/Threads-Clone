@@ -71,6 +71,7 @@ class AuthRepository @Inject constructor(
         password: String,
         imageUri: Uri?
     ) {
+        _registerResultLiveData.postValue(NetworkResult.Loading())
         try {
             //TODO remove the profile picture later and we will update the profile picture later while updating
             var image_url: String?=""
@@ -98,7 +99,6 @@ class AuthRepository @Inject constructor(
                 ""
             )
             try {
-
                 user?.uid?.let {
                     newUser.userId = it
                     Log.d("DATABASE_REFERENCE", firebaseDatabase.toString())
@@ -126,7 +126,6 @@ class AuthRepository @Inject constructor(
         MutableLiveData<Result<User?>>()
     val searchUserDetails: LiveData<Result<User?>>
         get() = _searchUserDetails
-
 
     suspend fun getUserData(user_Id: String? = null) {
         try {
@@ -175,10 +174,13 @@ class AuthRepository @Inject constructor(
         location: String,
         links: List<String>
     ) {
+        _updateUserDetail.postValue(
+            NetworkResult.Loading()
+        )
         val detailMap = HashMap<String, Any>()
         try {
+            var image_url: String?=SharedPref.getImageUrl(context)
             try {
-                var image_url: String?=""
                 if(imageUri!=null){
                     image_url = imageUri?.let {
                         storageReference.child(
@@ -204,7 +206,9 @@ class AuthRepository @Inject constructor(
             detailMap["location"] = location
             detailMap["links"] = links
             firebaseAuth.uid?.let {
+                firebaseDatabase.child("Users").child(it).updateChildren(detailMap).await()
                 firebaseFirestore.collection("Users").document(it).update(detailMap).await()
+                SharedPref.storeData(name, firebaseAuth.currentUser!!.email.toString(), bio, username, image_url, context)
             }
             _updateUserDetail.postValue(
                 NetworkResult.Success(

@@ -11,6 +11,7 @@ import androidx.paging.PagingSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.StorageReference
 import com.satyajit.threads.data.paging.ThreadsPagingSource
 import com.satyajit.threads.modals.ThreadsData
@@ -28,11 +29,8 @@ class HomeRepository @Inject constructor(
     private val firebaseStorage: StorageReference,
     @ApplicationContext val context: Context,
 ) {
-
-
     private val _threadsResultLiveData = MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
     val  threadsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>> get() = _threadsResultLiveData
-
     fun getThreads(): Flow<PagingData<ThreadsData>> {
         return Pager(
             config = PagingConfig(
@@ -47,21 +45,21 @@ class HomeRepository @Inject constructor(
             }
         ).flow
     }
-
     suspend fun getAllThreads(){
         _threadsResultLiveData.postValue(NetworkResult.Loading())
         try {
             val threadsList = ArrayList<ThreadsDataWithUserData>()
-            val threadsResponse = firebaseFireStore.collection("Threads").get().await()
+            val threadsResponse = firebaseFireStore
+                .collection("Threads")
+                .orderBy("timeStamp", Query.Direction.DESCENDING)
+                .get().await()
             if (!threadsResponse.isEmpty) {
                 threadsResponse.documents.forEach { threadDocument ->
                     val thread = threadDocument.toObject(ThreadsData::class.java)
                     thread?.let { threadData ->
-
                         val userId = threadData.userId
                         val userDocument = firebaseFireStore.collection("Users").document(userId).get().await()
                         val userData = userDocument.toObject(User::class.java)
-
                         val threadWithUserData = ThreadsDataWithUserData(threadData, userData!!)
                         threadsList.add(threadWithUserData)
                     }
@@ -76,5 +74,4 @@ class HomeRepository @Inject constructor(
             _threadsResultLiveData.postValue(NetworkResult.Error(e.localizedMessage))
         }
     }
-
 }
