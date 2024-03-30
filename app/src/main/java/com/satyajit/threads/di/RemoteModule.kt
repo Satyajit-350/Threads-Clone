@@ -1,5 +1,6 @@
 package com.satyajit.threads.di
 
+import com.satyajit.threads.BuildConfig
 import com.satyajit.threads.data.remote.NotificationSend
 import dagger.Module
 import dagger.Provides
@@ -29,7 +30,7 @@ object RemoteModule {
     fun provideAuthInterceptor() = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
         val newRequest: Request = chain.request().newBuilder()
             .addHeader("Content-Type","application/json")
-            .addHeader("Authorization", "key=AAAA_mNxH8M:APA91bE2d5Ldo923PwRu2uAKmOMpOQhkSAqwGzm8pT3oo1EoPWI_jCmWk0FR2aDKyZeJsucj9NTHQ6-rvjY3yjJA7sxxifaEllJRVqwFTXmJOZPCgOx4_yAmJXLLYJwISqRjmCbFqMrX")
+            .addHeader("Authorization", "key=${BuildConfig.API_KEY}")
             .build()
         chain.proceed(newRequest)
     }).build()
