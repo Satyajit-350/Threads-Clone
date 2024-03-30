@@ -96,7 +96,5 @@ fun HomeScreen(
                 )
             }
         }
-
     }
-
 }
