@@ -20,8 +20,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.satyajit.threads.navigation.NavGraph
 import com.satyajit.threads.navigation.Routes
+import com.satyajit.threads.presentation.home.HomeScreenViewModel
 import com.satyajit.threads.ui.theme.ThreadsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -30,7 +33,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel by viewModels<MainViewModel>()
-
+    private val homeScreenViewModel by viewModels<HomeScreenViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,6 +61,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@OnCompleteListener
+            }
+            homeScreenViewModel.updateToken(task.result)
+        })
+    }
 }

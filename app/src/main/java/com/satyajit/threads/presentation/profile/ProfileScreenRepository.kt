@@ -28,9 +28,7 @@ class ProfileScreenRepository @Inject constructor(
     val threadsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>> get() = _threadsResultLiveData
 
     suspend fun getAllThreads() {
-
         val currentUserUid = firebaseAuth.currentUser?.uid
-
         _threadsResultLiveData.postValue(NetworkResult.Loading())
         try {
             val threadsList = ArrayList<ThreadsDataWithUserData>()

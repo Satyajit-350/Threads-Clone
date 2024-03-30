@@ -49,7 +49,7 @@ class AuthRepository @Inject constructor(
                 }
                 if (userResponse?.exists() == true) {
                     val user = userResponse.toObject(User::class.java)
-                    SharedPref.storeData(user!!.name, user.email, user.bio, user.username, user.imageUrl, context)
+                    SharedPref.storeData(firebaseAuth.currentUser?.uid.toString(), user!!.name, user.email, user.bio, user.username, user.imageUrl, context)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -86,7 +86,7 @@ class AuthRepository @Inject constructor(
             val response = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             val user = response.user
 
-            SharedPref.storeData("",email, "", username, image_url, context)
+            SharedPref.storeData(firebaseAuth.currentUser?.uid.toString(),"",email, "", username, image_url, context)
             val newUser = User(
                 "",
                 user?.displayName ?: username,
@@ -208,7 +208,7 @@ class AuthRepository @Inject constructor(
             firebaseAuth.uid?.let {
                 firebaseDatabase.child("Users").child(it).updateChildren(detailMap).await()
                 firebaseFirestore.collection("Users").document(it).update(detailMap).await()
-                SharedPref.storeData(name, firebaseAuth.currentUser!!.email.toString(), bio, username, image_url, context)
+                SharedPref.storeData(firebaseAuth.currentUser?.uid.toString(), name, firebaseAuth.currentUser!!.email.toString(), bio, username, image_url, context)
             }
             _updateUserDetail.postValue(
                 NetworkResult.Success(

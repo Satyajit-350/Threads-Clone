@@ -6,6 +6,7 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,7 +14,10 @@ import com.google.firebase.storage.StorageReference
 import com.satyajit.threads.modals.ThreadsData
 import com.satyajit.threads.utils.NetworkResult
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.json.JSONObject
 import java.util.UUID
 import javax.inject.Inject
 
@@ -108,6 +112,7 @@ class AddThreadsRepository @Inject constructor(
 //            _addPostStatus.postValue(NetworkResult.Error(e.stackTraceToString(), statusCode = 500))
 //        }
 //    }
+
 
     private fun getFileExtension(uri: Uri, context: Context): String? {
         val contentResolver: ContentResolver = context.contentResolver

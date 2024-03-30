@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Threads</string>
+    <string name="default_notification_channel_id">threads_notification_channel</string>
+
 </resources>

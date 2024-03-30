@@ -14,5 +14,6 @@
     <color name="shimmer">#C3C3C3</color>
     <color name="body">#4E4B66</color>
     <color name="input_background">#fff</color>
+    <color name="light_orange">#FFBF62</color>
 
 </resources>

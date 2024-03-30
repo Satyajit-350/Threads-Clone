@@ -1,5 +1,8 @@
 package com.satyajit.threads.modals
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class User(
 
     val name: String = "",
@@ -12,6 +15,8 @@ data class User(
     val links: List<String> = emptyList(),
     val location: String = "",
     val notificationToken: String = "",
-    val profileType: Boolean = false
-)
+    val profileType: Boolean = false,
+    val followers: ArrayList<String> = arrayListOf(),
+    val following: ArrayList<String> = arrayListOf(),
+):java.io.Serializable
 

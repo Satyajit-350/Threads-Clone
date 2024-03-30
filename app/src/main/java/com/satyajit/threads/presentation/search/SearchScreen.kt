@@ -1,5 +1,6 @@
 package com.satyajit.threads.presentation.search
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,9 +39,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.satyajit.threads.presentation.common.UserItem
 import com.satyajit.threads.presentation.onboarding.common.CustomSearchBar
 import com.satyajit.threads.presentation.search.common.UserSearchItem
 import com.satyajit.threads.utils.NetworkResult
+import com.satyajit.threads.utils.SharedPref
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,8 +122,16 @@ fun SearchScreen(
                                 val filterItems = result.data!!.filter {
                                     it.username.contains(searchText, ignoreCase = false)
                                 }
+                                Log.d("followersLogs", SharedPref.getUserId(context)).toString()
                                 items(filterItems) { users ->
-                                    UserSearchItem(username = users.username, name = users.name, image = users.imageUrl)
+                                    val isFollowedState = remember { mutableStateOf(users.followers.contains(SharedPref.getUserId(context))) }
+                                    UserItem(
+                                        user = users,
+                                        isFollowed = isFollowedState,
+                                        onFollowToggle = { newValue ->
+                                            isFollowedState.value = newValue
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -134,8 +146,6 @@ fun SearchScreen(
                     is NetworkResult.Loading -> {
                         true
                     }
-
-                    else -> {true}
                 }
             }
         }
