@@ -22,12 +22,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.annotation.ExperimentalCoilApi
 import com.satyajit.threads.presentation.common.ThreadItem
 import com.satyajit.threads.presentation.profile.ProfileScreenViewModel
 import com.satyajit.threads.utils.NetworkResult
 
-@OptIn(ExperimentalCoilApi::class)
+
 @Composable
 fun ThreadsScreen(
     navHostController: NavHostController,
@@ -67,8 +66,8 @@ fun ThreadsScreen(
                             }
                         }
                         items(count = items.size) {
-                            items[it].let { threadWithUserData ->
-                                ThreadItem(threadWithUserData)
+                            items[it]?.let { threadWithUserData ->
+                                ThreadItem(threadWithUserData, navHostController)
                             }
                         }
                     }
@@ -84,10 +83,7 @@ fun ThreadsScreen(
                     true
                 }
 
-                else -> {true}
             }
-
         }
     }
-
 }

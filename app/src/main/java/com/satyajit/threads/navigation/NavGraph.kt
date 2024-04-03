@@ -1,8 +1,6 @@
 package com.satyajit.threads.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
@@ -11,12 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.presentation.add_thread.AddThreadScreen
 import com.satyajit.threads.presentation.auth.common.AuthScreen
 import com.satyajit.threads.presentation.common.BottomNavigation
 import com.satyajit.threads.presentation.home.HomeScreen
 import com.satyajit.threads.presentation.auth.login.LoginScreen
 import com.satyajit.threads.presentation.auth.register.RegisterScreen
+import com.satyajit.threads.presentation.home.thread_details.ThreadDetail
 import com.satyajit.threads.presentation.notification.NotificationScreen
 import com.satyajit.threads.presentation.onboarding.FollowScreen
 import com.satyajit.threads.presentation.onboarding.PrivacyInfo
@@ -83,7 +83,26 @@ fun NavGraph(
         composable(Routes.BottomNav.route) {
             BottomNavigation(navController)
         }
-        composable(Routes.Settings.route) {
+        composable(Routes.Settings.route,
+            enterTransition = {
+                return@composable slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            popEnterTransition = {
+                return@composable slideInHorizontally(
+                    initialOffsetX = { -(it) },
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
             SettingsScreen(navController)
         }
         composable(Routes.Privacy.route,
@@ -175,6 +194,36 @@ fun NavGraph(
             }
         ) {
             EditBioScreen(navHostController = navController)
+        }
+
+        composable(Routes.ThreadDetail.route,
+            enterTransition = {
+                return@composable slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            popEnterTransition = {
+                return@composable slideInHorizontally(
+                    initialOffsetX = { -(it) },
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            val result =
+                navController.previousBackStackEntry?.savedStateHandle?.get<ThreadsDataWithUserData?>(
+                    "threads"
+                )
+            ThreadDetail(
+                threadData = result,
+                navHostController = navController
+            )
         }
     }
 }

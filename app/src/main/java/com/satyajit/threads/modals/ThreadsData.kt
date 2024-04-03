@@ -1,11 +1,15 @@
 package com.satyajit.threads.modals
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ThreadsData(
     val threadtxt: String = "",
     val image: String? = "",
     val userId: String = "",
     val timeStamp: String = ""
-){
+): Parcelable{
     val getTimeAgo: String get()  {
         val currentTime = System.currentTimeMillis()
         val timeDifference = currentTime - timeStamp.toLong()

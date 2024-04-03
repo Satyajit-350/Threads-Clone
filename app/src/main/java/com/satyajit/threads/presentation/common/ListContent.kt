@@ -16,13 +16,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import com.satyajit.threads.modals.ThreadsDataWithUserData
+import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.home.common.HomeTopBar
+import com.satyajit.threads.utils.toJson
 
 @ExperimentalCoilApi
 @Composable
 fun ListContent(
     items: List<ThreadsDataWithUserData>,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     Log.d("Threads_list", items.size.toString())
 
@@ -34,9 +36,10 @@ fun ListContent(
             HomeTopBar()
             Spacer(modifier = Modifier.height(2.dp))
 
-            if(items.isEmpty()){
+            if (items.isEmpty()) {
                 Text(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(20.dp),
                     text = "No Threads Posted Yet",
                     textAlign = TextAlign.Center
@@ -45,7 +48,10 @@ fun ListContent(
         }
         items(count = items.size) {
             items[it]?.let { threadWithUserData ->
-                ThreadItem(threadWithUserData)
+                ThreadItem(
+                    threadWithUserData,
+                    navHostController,
+                )
             }
         }
     }

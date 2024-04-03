@@ -1,5 +1,6 @@
 package com.satyajit.threads.presentation.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,9 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.satyajit.threads.presentation.common.ListContent
 import com.satyajit.threads.utils.NetworkResult
+import com.satyajit.threads.utils.toJson
 import kotlinx.coroutines.delay
+import java.net.URLEncoder
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -71,7 +74,7 @@ fun HomeScreen(
                         is NetworkResult.Success -> {
                             ListContent(
                                 items = result.data!!,
-                                navHostController = navHostController
+                                navHostController = navHostController,
                             )
                             isLoading = false
                         }

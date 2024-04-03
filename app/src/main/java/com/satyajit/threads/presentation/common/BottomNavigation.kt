@@ -31,7 +31,7 @@ fun BottomNavigation(navHostController: NavHostController) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Routes.Home.route){
-                HomeScreen(navController)
+                HomeScreen(navHostController)
             }
             composable(Routes.Notification.route){
                 NotificationScreen()

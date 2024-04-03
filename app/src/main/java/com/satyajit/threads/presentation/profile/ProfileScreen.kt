@@ -190,6 +190,7 @@ fun ProfileScreen(
                                 Box(
                                     modifier = Modifier
                                         .padding(horizontal = 5.dp)
+                                        .weight(1f)
                                         .wrapContentWidth()
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(Color.LightGray.copy(0.2f))
@@ -203,9 +204,7 @@ fun ProfileScreen(
                                         fontSize = 12.sp,
                                         color = Color.DarkGray
                                     )
-
                                 }
-
                             }
 
                             Spacer(modifier = Modifier.height(5.dp))
