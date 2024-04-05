@@ -18,6 +18,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -408,13 +409,13 @@ fun TabLayout(tabData: List<String>, pagerState: PagerState) {
                     )
                     .padding(horizontal = 3.dp),
                 height = 3.dp,
-                color = Color.Black
+                color = if(isSystemInDarkTheme()) Color.LightGray else Color.Black
             )
         },
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        backgroundColor = MaterialTheme.colors.onPrimary,
+        backgroundColor = Color.Transparent,
     ) {
         tabData.forEachIndexed { index, data ->
             Tab(selected = pagerState.currentPage == index, onClick = {

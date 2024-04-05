@@ -24,4 +24,5 @@ sealed class Routes(val route: String) {
     data object EditProfile: Routes("EditProfile")
     data object EditBio: Routes("EditBio")
     data object ThreadDetail: Routes("ThreadDetail")
+    data object ThreadReply: Routes("ThreadReply")
 }

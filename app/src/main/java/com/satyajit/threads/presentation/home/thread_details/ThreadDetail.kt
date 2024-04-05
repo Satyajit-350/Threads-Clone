@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.MoreHoriz
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,12 +41,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
 import com.satyajit.threads.modals.ThreadsDataWithUserData
+import com.satyajit.threads.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +61,12 @@ fun ThreadDetail(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Thread") },
+                title = {
+                    Text(
+                        text = "Thread",
+                    fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         //TODO
@@ -69,6 +79,30 @@ fun ThreadDetail(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp)
+                    .height(50.dp)
+                    .clip(RoundedCornerShape(50.dp))
+                    .clickable {
+                        if (threadData != null) {
+                            navHostController.currentBackStackEntry?.savedStateHandle?.set(
+                                key = "threads",
+                                value = threadData
+                            )
+                            navHostController.navigate(Routes.ThreadReply.route)
+                        } else {
+                            Log.e("Navigation", "Thread data is null, cannot navigate")
+                        }
+                    }
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                        .align(Alignment.CenterVertically),
+                    text = "Reply",
+                )
+            }
         }
     ) { paddingValues ->
 
@@ -160,7 +194,8 @@ fun GetThreadItem(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -173,27 +208,27 @@ fun GetThreadItem(
 
                     Icon(
                         modifier = Modifier
-                            .clickable {  },
+                            .clickable { },
                         imageVector = Icons.Outlined.FavoriteBorder,
                         contentDescription = "photo library"
                     )
                     Icon(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
-                            .clickable {  },
+                            .clickable { },
                         imageVector = Icons.Outlined.ModeComment,
                         contentDescription = "gif"
                     )
                     Icon(
                         modifier = Modifier
-                            .clickable {  },
+                            .clickable { },
                         imageVector = Icons.Outlined.Repeat,
                         contentDescription = "mic"
                     )
                     Icon(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
-                            .clickable {  },
+                            .clickable { },
                         imageVector = Icons.Outlined.Send,
                         contentDescription = "library"
                     )
@@ -207,7 +242,9 @@ fun GetThreadItem(
                 color = Color.DarkGray
             )
         }
-        Divider(modifier = Modifier.fillMaxWidth().height(1.dp))
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp))
     }
 }
 

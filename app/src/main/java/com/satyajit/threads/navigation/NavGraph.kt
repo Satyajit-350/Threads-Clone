@@ -30,6 +30,7 @@ import com.satyajit.threads.presentation.profile.edit_profile.EditProfileScreen
 import com.satyajit.threads.presentation.profile.privacy.mentions.MentionsScreen
 import com.satyajit.threads.presentation.search.SearchScreen
 import com.satyajit.threads.presentation.profile.settings.SettingsScreen
+import com.satyajit.threads.presentation.reply.ReplyScreen
 
 @Composable
 fun NavGraph(
@@ -221,6 +222,36 @@ fun NavGraph(
                     "threads"
                 )
             ThreadDetail(
+                threadData = result,
+                navHostController = navController
+            )
+        }
+
+        composable(Routes.ThreadReply.route,
+            enterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(200)
+                )
+            },
+            popEnterTransition = {
+                return@composable slideInVertically(
+                    initialOffsetY = { -(it) },
+                    animationSpec = tween(200)
+                )
+            }
+        ) {
+            val result =
+                navController.previousBackStackEntry?.savedStateHandle?.get<ThreadsDataWithUserData?>(
+                    "threads"
+                )
+            ReplyScreen(
                 threadData = result,
                 navHostController = navController
             )
