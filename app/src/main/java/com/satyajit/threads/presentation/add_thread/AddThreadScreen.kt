@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,10 +27,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Clear
@@ -38,11 +37,7 @@ import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Segment
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.GifBox
-import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -50,7 +45,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,14 +55,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,16 +69,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
-import com.satyajit.threads.presentation.auth.viewmodel.AuthViewModel
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
 import com.satyajit.threads.utils.NetworkResult
 import com.satyajit.threads.utils.SharedPref
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun AddThreadScreen(navController: NavHostController) {
 
@@ -126,25 +117,45 @@ fun AddThreadScreen(navController: NavHostController) {
         imageUri = uri
     }
 
-    val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
+    val permissionToRequest = mutableListOf<String>()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        permissionToRequest.add(
+            Manifest.permission.READ_MEDIA_IMAGES,
+        )
+        permissionToRequest.add(
+            Manifest.permission.READ_MEDIA_VIDEO,
+        )
+        permissionToRequest.add(
+            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+        )
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        permissionToRequest.add(
+            Manifest.permission.READ_MEDIA_IMAGES,
+        )
+        permissionToRequest.add(
+            Manifest.permission.READ_MEDIA_VIDEO,
+        )
     } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        permissionToRequest.add(
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(
-                context,
-                "Permission Not Granted!! Please grant permisssion",
-                Toast.LENGTH_SHORT
-            ).show()
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            val allGranted = permissions.all { it.value }
+            if (allGranted) {
+                launcher.launch("image/*")
+            } else {
+                Toast.makeText(
+                    context,
+                    "Permissions Not Granted!! Please grant permissions",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-    }
+    )
 
     LaunchedEffect(threadsUploadResult) {
         when (threadsUploadResult) {
@@ -172,9 +183,7 @@ fun AddThreadScreen(navController: NavHostController) {
                     }
                 }
             }
-
             null -> {}
-            else -> {}
         }
     }
 
@@ -309,13 +318,13 @@ fun AddThreadScreen(navController: NavHostController) {
 
                                 IconButton(onClick = {
 
-                                    val isGranted = ContextCompat.checkSelfPermission(
-                                        context, permissionToRequest
-                                    ) == PackageManager.PERMISSION_GRANTED
+                                    val isGranted = permissionToRequest.all { permission ->
+                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                    }
                                     if (isGranted) {
                                         launcher.launch("image/*")
                                     } else {
-                                        permissionLauncher.launch(permissionToRequest)
+                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
                                     }
 
                                 }) {
@@ -334,7 +343,16 @@ fun AddThreadScreen(navController: NavHostController) {
                                     )
 
                                 }
-                                IconButton(onClick = { /*TODO*/ }) {
+                                IconButton(onClick = {
+                                    val isGranted = permissionToRequest.all { permission ->
+                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                    }
+                                    if (isGranted) {
+                                        launcher.launch("audio/*")
+                                    } else {
+                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
+                                    }
+                                }) {
 
                                     Icon(
                                         imageVector = Icons.Outlined.Mic,
@@ -342,7 +360,15 @@ fun AddThreadScreen(navController: NavHostController) {
                                     )
 
                                 }
-                                IconButton(onClick = { /*TODO*/ }) {
+                                IconButton(onClick = {
+                                    val isGranted = permissionToRequest.all { permission ->
+                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                    }
+                                    if (isGranted) {
+                                        launcher.launch("video/*")
+                                    } else {
+                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
+                                    }                                }) {
 
                                     Icon(
                                         imageVector = Icons.Outlined.Segment,
@@ -352,29 +378,18 @@ fun AddThreadScreen(navController: NavHostController) {
                             }
                         } else {
 
-//                            Card(
-//                                modifier = Modifier
-//                                    .background(Color.LightGray)
-//                                    .wrapContentWidth()
-//                                    .wrapContentHeight(),
-//                                shape = RoundedCornerShape(8.dp),
-//                            ) {
-//
-//                            }
-
                             val painter = rememberAsyncImagePainter(model = imageUri)
 
                             Box(
                                 modifier = Modifier
+                                    .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
-                                    .wrapContentWidth()
-                                    .height(250.dp)
-
+                                    .shadow(0.dp, shape = RoundedCornerShape(8.dp))
                             ) {
                                 Image(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .height(IntrinsicSize.Min),
+                                        .fillMaxWidth()
+                                        .aspectRatio(0.8f),
                                     painter = painter,
                                     contentDescription = "thread image",
                                     contentScale = ContentScale.FillBounds
@@ -395,15 +410,12 @@ fun AddThreadScreen(navController: NavHostController) {
                             }
                         }
 
-
                         Text(
                             modifier = Modifier.padding(top = 10.dp),
                             text = "Add to thread",
                             fontSize = 14.sp,
                             color = if (isEnabled) Color.DarkGray else Color.LightGray
                         )
-
-
                     }
 
                     Spacer(modifier = Modifier.width(5.dp))
@@ -415,11 +427,8 @@ fun AddThreadScreen(navController: NavHostController) {
                         )
                     }
                 }
-
             }
-
         }
-
 
         Row(
             modifier = Modifier
@@ -465,11 +474,8 @@ fun AddThreadScreen(navController: NavHostController) {
                     text = "Post"
                 )
             }
-
         }
-
     }
-
 }
 
 @Composable
