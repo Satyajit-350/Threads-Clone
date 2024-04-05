@@ -73,8 +73,8 @@ class AuthRepository @Inject constructor(
     ) {
         _registerResultLiveData.postValue(NetworkResult.Loading())
         try {
-            //TODO remove the profile picture later and we will update the profile picture later while updating
-            var image_url: String?=""
+
+            var image_url: String?="https://firebasestorage.googleapis.com/v0/b/threads-501d6.appspot.com/o/UsersImage%2Fdefault_profile_img.jpg?alt=media&token=fd2abe60-8976-49f5-b644-16b1b43507f2"
             if(imageUri!=null){
                 image_url = imageUri?.let {
                     storageReference.child(

@@ -281,7 +281,7 @@ fun RegisterScreen(
                             usernameState.value,
                             emailState.value,
                             passwordState.value,
-                            imageUri!!
+                            imageUri
                         )
                         isLoading = true
                     }
