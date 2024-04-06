@@ -33,7 +33,7 @@ class AddThreadsRepository @Inject constructor(
     val newThreadsLiveData: LiveData<NetworkResult<String>>
         get() = _newThreadsLiveData
 
-    suspend fun uploadThreads(threads: String, imageUri: Uri?){
+    suspend fun uploadThreads(threads: String, imageUri: Uri?, videoUri: Uri?){
         try{
             val time = System.currentTimeMillis()
             val image_url = imageUri?.let {
@@ -41,9 +41,15 @@ class AddThreadsRepository @Inject constructor(
                     "ThreadsImage/${firebaseAuth.uid + UUID.randomUUID() + time}" + getFileExtension(it,context)
                 ).putFile(it).await().storage.downloadUrl.await().toString()
             }
+            val video_url = videoUri?.let {
+                storageReference.child(
+                    "ThreadsVideo/${firebaseAuth.uid + UUID.randomUUID() + time}" + getFileExtension(it,context)
+                ).putFile(it).await().storage.downloadUrl.await().toString()
+            }
             val threadsData = ThreadsData(
                 threads,
                 image_url,
+                video_url,
                 firebaseAuth.uid.toString(),
                 System.currentTimeMillis().toString()
             )

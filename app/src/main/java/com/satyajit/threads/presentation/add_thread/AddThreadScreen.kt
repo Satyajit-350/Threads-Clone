@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -74,6 +75,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
+import com.satyajit.threads.presentation.common.Exoplayer
 import com.satyajit.threads.utils.NetworkResult
 import com.satyajit.threads.utils.SharedPref
 
@@ -115,6 +117,25 @@ fun AddThreadScreen(navController: NavHostController) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
+    }
+    var videoUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        videoUri = uri
+    }
+
+    var audioUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val audioLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        audioUri = uri
     }
 
     val permissionToRequest = mutableListOf<String>()
@@ -183,17 +204,18 @@ fun AddThreadScreen(navController: NavHostController) {
                     }
                 }
             }
+
             null -> {}
         }
     }
 
-    if(isLoading){
+    if (isLoading) {
         Dialog(
             onDismissRequest = { isLoading = false },
             DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
         ) {
             Box(
-                contentAlignment= Alignment.Center,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(100.dp)
                     .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
@@ -247,7 +269,7 @@ fun AddThreadScreen(navController: NavHostController) {
                                 .size(50.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop,
-                            painter = if(SharedPref.getImageUrl(context)!="")
+                            painter = if (SharedPref.getImageUrl(context) != "")
                                 rememberAsyncImagePainter(model = SharedPref.getImageUrl(context))
                             else
                                 painterResource(id = R.drawable.default_profile_img),
@@ -305,7 +327,7 @@ fun AddThreadScreen(navController: NavHostController) {
                             }
                         )
 
-                        if (imageUri == null) {
+                        if (imageUri == null && videoUri == null && audioUri == null) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -319,7 +341,10 @@ fun AddThreadScreen(navController: NavHostController) {
                                 IconButton(onClick = {
 
                                     val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            permission
+                                        ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
                                         launcher.launch("image/*")
@@ -345,10 +370,13 @@ fun AddThreadScreen(navController: NavHostController) {
                                 }
                                 IconButton(onClick = {
                                     val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            permission
+                                        ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
-                                        launcher.launch("audio/*")
+                                        audioLauncher.launch("audio/*")
                                     } else {
                                         permissionLauncher.launch(permissionToRequest.toTypedArray())
                                     }
@@ -362,13 +390,17 @@ fun AddThreadScreen(navController: NavHostController) {
                                 }
                                 IconButton(onClick = {
                                     val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            permission
+                                        ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
-                                        launcher.launch("video/*")
+                                        videoLauncher.launch("video/*")
                                     } else {
                                         permissionLauncher.launch(permissionToRequest.toTypedArray())
-                                    }                                }) {
+                                    }
+                                }) {
 
                                     Icon(
                                         imageVector = Icons.Outlined.Segment,
@@ -376,7 +408,25 @@ fun AddThreadScreen(navController: NavHostController) {
                                     )
                                 }
                             }
-                        } else {
+                        }
+                        else if(videoUri != null){
+                            Box(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(end = 8.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .aspectRatio(1f)
+                                    .wrapContentHeight(),
+                            ) {
+                                Exoplayer(
+                                    uri = videoUri,
+                                    onRemove = {
+                                        videoUri = null
+                                    }
+                                )
+                            }
+                        }
+                        else {
 
                             val painter = rememberAsyncImagePainter(model = imageUri)
 
@@ -465,7 +515,7 @@ fun AddThreadScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-                    addThreadsViewModel.uploadThreads(threads = threadText, imageUri)
+                    addThreadsViewModel.uploadThreads(threads = threadText, imageUri, videoUri)
                     isLoading = true
                 },
                 enabled = isEnabled

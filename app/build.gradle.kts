@@ -136,4 +136,7 @@ dependencies {
     //custom chrome tabs
     implementation ("androidx.browser:browser:1.8.0")
 
+    //exoplayer
+    implementation ("com.google.android.exoplayer:exoplayer:2.19.1")
+
 }

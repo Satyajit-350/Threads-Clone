@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class ThreadsData(
     val threadtxt: String = "",
     val image: String? = "",
+    val video: String? = "",
     val userId: String = "",
     val timeStamp: String = ""
 ): Parcelable{

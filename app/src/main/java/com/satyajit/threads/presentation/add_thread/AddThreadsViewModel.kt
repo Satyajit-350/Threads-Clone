@@ -16,9 +16,9 @@ class AddThreadsViewModel @Inject constructor(
 
     val threadsUploadResult = repository.newThreadsLiveData
 
-    fun uploadThreads(threads: String, image: Uri?){
+    fun uploadThreads(threads: String, image: Uri?, video: Uri?){
         viewModelScope.launch (Dispatchers.IO){
-            repository.uploadThreads(threads,image)
+            repository.uploadThreads(threads, image, video)
         }
     }
 

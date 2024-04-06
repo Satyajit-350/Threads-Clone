@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
@@ -174,6 +175,23 @@ fun ThreadItem(
                             }
                         }
 
+                        threadData.threads.video?.let {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .wrapContentHeight()
+                                    .aspectRatio(1f),
+                            ) {
+                                Exoplayer(
+                                    uri = threadData.threads.video.toUri(),
+                                    onRemove = {},
+                                    showController = true,
+                                    showRemoveBtn = false
+                                )
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Row(
@@ -192,7 +210,7 @@ fun ThreadItem(
                             Icon(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
-                                    .clickable {  },
+                                    .clickable { },
                                 imageVector = Icons.Outlined.ModeComment,
                                 contentDescription = "gif"
                             )

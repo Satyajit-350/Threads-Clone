@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,11 +47,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
 import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.navigation.Routes
+import com.satyajit.threads.presentation.common.Exoplayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -191,6 +195,23 @@ fun GetThreadItem(
                     contentDescription = "thread image",
                     contentScale = ContentScale.FillHeight
                 )
+            }
+
+            data.threads?.video?.let {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .wrapContentHeight()
+                        .aspectRatio(1f),
+                ) {
+                    Exoplayer(
+                        uri = data.threads.video.toUri(),
+                        onRemove = {},
+                        showController = true,
+                        showRemoveBtn = false
+                    )
+                }
             }
 
             Row(

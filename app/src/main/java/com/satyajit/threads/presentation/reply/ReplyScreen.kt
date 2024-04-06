@@ -58,11 +58,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
 import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
+import com.satyajit.threads.presentation.common.Exoplayer
 import com.satyajit.threads.utils.SharedPref
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,10 +81,30 @@ fun ReplyScreen(
         mutableStateOf<Uri?>(null)
     }
 
-    val launcher = rememberLauncherForActivityResult(
+    val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
+    }
+
+    var videoUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        videoUri = uri
+    }
+
+    var audioUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val audioLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        audioUri = uri
     }
 
     val permissionToRequest = mutableListOf<String>()
@@ -114,7 +136,7 @@ fun ReplyScreen(
         onResult = { permissions ->
             val allGranted = permissions.all { it.value }
             if (allGranted) {
-                launcher.launch("image/*")
+                imageLauncher.launch("image/*")
             } else {
                 Toast.makeText(
                     context,
@@ -231,6 +253,22 @@ fun ReplyScreen(
                                     contentScale = ContentScale.FillBounds
                                 )
                             }
+                            data.threads.video?.let {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .wrapContentHeight()
+                                        .aspectRatio(1f),
+                                ) {
+                                    Exoplayer(
+                                        uri = data.threads.video.toUri(),
+                                        onRemove = {},
+                                        showController = true,
+                                        showRemoveBtn = false
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -329,7 +367,7 @@ fun ReplyScreen(
                             }
                         )
 
-                        if (imageUri == null) {
+                        if (imageUri == null && videoUri == null && audioUri == null) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -349,7 +387,7 @@ fun ReplyScreen(
                                         ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
-                                        launcher.launch("image/*")
+                                        imageLauncher.launch("image/*")
                                     } else {
                                         permissionLauncher.launch(permissionToRequest.toTypedArray())
                                     }
@@ -378,7 +416,7 @@ fun ReplyScreen(
                                         ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
-                                        launcher.launch("audio/*")
+                                        audioLauncher.launch("audio/*")
                                     } else {
                                         permissionLauncher.launch(permissionToRequest.toTypedArray())
                                     }
@@ -398,7 +436,7 @@ fun ReplyScreen(
                                         ) == PackageManager.PERMISSION_GRANTED
                                     }
                                     if (isGranted) {
-                                        launcher.launch("video/*")
+                                        videoLauncher.launch("video/*")
                                     } else {
                                         permissionLauncher.launch(permissionToRequest.toTypedArray())
                                     }
@@ -410,7 +448,24 @@ fun ReplyScreen(
                                     )
                                 }
                             }
-                        } else {
+                        }
+                        else if(videoUri != null){
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 8.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .aspectRatio(1f),
+                            ) {
+                                Exoplayer(
+                                    uri = videoUri,
+                                    onRemove = {
+                                        videoUri = null
+                                    }
+                                )
+                            }
+                        }
+                        else {
 
                             val painter = rememberAsyncImagePainter(model = imageUri)
 
