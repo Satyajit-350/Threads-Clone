@@ -73,12 +73,14 @@ import com.satyajit.threads.presentation.auth.viewmodel.AuthViewModel
 import com.satyajit.threads.presentation.common.CustomDialog
 import com.satyajit.threads.utils.NetworkResult
 import com.satyajit.threads.utils.SharedPref
+import com.satyajit.threads.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     navHostController: NavHostController,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel
 ) {
 
     val context = LocalContext.current
@@ -301,7 +303,9 @@ fun EditProfileScreen(
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
                                     .clickable {
-                                        navHostController.navigate(Routes.EditBio.route)
+                                        navHostController.navigate(
+                                            Routes.EditBio.route
+                                        )
                                     }
                             ) {
                                 Text(
@@ -311,8 +315,8 @@ fun EditProfileScreen(
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
-                                    text = if (SharedPref.getBio(context) != "") {
-                                        SharedPref.getBio(context)
+                                    text = if (sharedViewModel.bio.value != "") {
+                                        sharedViewModel.bio.value
                                     } else {
                                         "+ Write bio"
                                     },
@@ -475,7 +479,7 @@ fun EditProfileScreen(
                             SharedPref.getName(context),
                             imageUri,
                             "",
-                            SharedPref.getBio(context),
+                            sharedViewModel.bio.value,
                             "",
                             emptyList()
                         )

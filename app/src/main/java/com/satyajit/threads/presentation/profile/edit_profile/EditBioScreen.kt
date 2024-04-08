@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,27 +25,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
 import com.satyajit.threads.utils.SharedPref
+import com.satyajit.threads.viewmodel.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBioScreen(
     navHostController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
 
     var isEnabled by remember {
         mutableStateOf(false)
     }
 
-    var bioText by remember {
-        mutableStateOf("")
-    }
-
     val context = LocalContext.current
+
+    var bioText by remember { mutableStateOf(sharedViewModel.bio.value) }
+
+    if(SharedPref.getBio(context)!=""){
+        bioText = SharedPref.getBio(context)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -66,7 +68,7 @@ fun EditBioScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            SharedPref.setBio(context, bioText)
+                            sharedViewModel.bio.value = bioText
                             navHostController.popBackStack()
                         },
                         enabled = isEnabled

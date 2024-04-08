@@ -1,11 +1,14 @@
 package com.satyajit.threads.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,12 +34,16 @@ import com.satyajit.threads.presentation.profile.privacy.mentions.MentionsScreen
 import com.satyajit.threads.presentation.search.SearchScreen
 import com.satyajit.threads.presentation.profile.settings.SettingsScreen
 import com.satyajit.threads.presentation.reply.ReplyScreen
+import com.satyajit.threads.viewmodel.SharedViewModel
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun NavGraph(
     navController: NavHostController,
     startDestination: String
 ) {
+
+    val viewModel: SharedViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -79,7 +86,9 @@ fun NavGraph(
             SearchScreen(navController)
         }
         composable(Routes.AddThreads.route) {
-            AddThreadScreen(navController)
+            AddThreadScreen(
+                navController = navController
+            )
         }
         composable(Routes.BottomNav.route) {
             BottomNavigation(navController)
@@ -171,7 +180,10 @@ fun NavGraph(
                 )
             }
         ) {
-            EditProfileScreen(navHostController = navController)
+            EditProfileScreen(
+                navHostController = navController,
+                sharedViewModel = viewModel
+            )
         }
 
         composable(Routes.EditBio.route,
@@ -194,7 +206,10 @@ fun NavGraph(
                 )
             }
         ) {
-            EditBioScreen(navHostController = navController)
+            EditBioScreen(
+                navHostController = navController,
+                sharedViewModel = viewModel
+            )
         }
 
         composable(Routes.ThreadDetail.route,

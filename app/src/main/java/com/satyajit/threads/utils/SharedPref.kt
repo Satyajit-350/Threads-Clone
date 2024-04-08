@@ -48,12 +48,6 @@ object SharedPref {
         return sharedPreferences.getString("bio", "")!!
     }
 
-    fun setBio(context: Context, bio:String){
-        val sharedPref = context.getSharedPreferences("users", MODE_PRIVATE)
-        sharedPref.edit().putString("bio", bio).apply()
-    }
-
-
     fun getEmail(context: Context): String {
         val sharedPreferences = context.getSharedPreferences("users", MODE_PRIVATE)
         return sharedPreferences.getString("email", "")!!
