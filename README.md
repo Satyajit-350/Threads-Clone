@@ -7,8 +7,7 @@ This app is under development.
 ## Techs Used 💻
 - 100% [Kotlin](https://kotlinlang.org/) based
 - [Jetpack Compose](https://developer.android.com/jetpack/compose) - modern toolkit for building native Android UI.
-- [Coroutines](https://github.com/Kotlin/kotlinx.coroutines)
-- [Flow](https://developer.android.com/kotlin/flow)
+- [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) & [Flow](https://developer.android.com/kotlin/flow) -  Kotlin libraries for asynchronous programming and reactive streams, respectively.
 - [Dagger-Hilt](https://dagger.dev/hilt/) - Standard library to incorporate Dagger dependency injection into an Android application.
 - [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) - Stores UI-related data that is lifecycle aware (didn't destroyed on UI changes).
 - [Android Architecture Components](https://developer.android.com/topic/architecture) - Collection of libraries that help you design robust, testable, and maintainable apps.
