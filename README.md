@@ -23,9 +23,7 @@ This app is under development.
 | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/Screenshot_20240325_175506.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/login.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/register.png) | 
 |-------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------|
 | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/save_info.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/import_profile.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/profile_type.png) | 
-|-------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------|
 | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/follow.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/working.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/home.png) | 
-|-------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------|
 | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/search.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/add_threads.png) | ![](https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/profile_screen.png) | 
 
 ### More Screens I'll be addding soon...
