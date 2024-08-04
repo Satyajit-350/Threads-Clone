@@ -76,13 +76,13 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("com.google.firebase:firebase-auth:22.3.1")
-    implementation("com.google.firebase:firebase-database:20.3.1")
-    implementation("com.google.firebase:firebase-firestore:24.10.3")
-    implementation("com.google.firebase:firebase-storage:20.3.0")
-    implementation("com.google.firebase:firebase-messaging:23.4.1")
-    implementation ("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.firebase:firebase-analytics:21.6.1")
+    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("com.google.firebase:firebase-database:21.0.0")
+    implementation("com.google.firebase:firebase-firestore:25.0.0")
+    implementation("com.google.firebase:firebase-storage:21.0.0")
+    implementation("com.google.firebase:firebase-messaging:24.0.0")
+    implementation ("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.google.firebase:firebase-analytics:22.0.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -94,18 +94,18 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
     //Live Data
-    implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
 
     //Splash Api
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     //Compose Navigation
-    implementation ("androidx.navigation:navigation-compose:2.7.6")
+    implementation ("androidx.navigation:navigation-compose:2.7.7")
 
     //Dagger Hilt
     implementation ("com.google.dagger:hilt-android:2.48")
     kapt ("com.google.dagger:hilt-compiler:2.48")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // system bars customization
     implementation ("com.google.accompanist:accompanist-systemuicontroller:0.30.1")

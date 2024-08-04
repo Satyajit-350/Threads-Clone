@@ -34,7 +34,6 @@ class NotificationService: FirebaseMessagingService() {
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
 
-    @OptIn(ExperimentalSerializationApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(message: RemoteMessage) {
         val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, "CHANNEL_ID")
@@ -42,17 +41,18 @@ class NotificationService: FirebaseMessagingService() {
         var pendingIntent: PendingIntent? = null
 
         val body = Json.decodeFromString<Map<String, String>>(message.notification?.body.toString())
-        
-        Log.d("notificationMessage", "onMessageReceived: $body")
+
         builder.setContentTitle(message.notification?.title)
         if (body["type"] == "FOLLOW") {
             builder.setContentText(body["messageBody"])
-            Log.d("notificationBody", "onMessageReceived: $body")
             resultIntent = Intent(this, MainActivity::class.java)
             resultIntent.putExtra("type", "FOLLOW")
             pendingIntent =
                 PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_IMMUTABLE)
             builder.setContentIntent(pendingIntent)
+        }
+        else if(body["type"] == "POST"){
+            //TODO
         }
         builder.setSmallIcon(R.mipmap.ic_launcher)
         builder.setAutoCancel(true)
@@ -74,5 +74,4 @@ class NotificationService: FirebaseMessagingService() {
             homeRepository.updateToken(token)
         }
     }
-
 }

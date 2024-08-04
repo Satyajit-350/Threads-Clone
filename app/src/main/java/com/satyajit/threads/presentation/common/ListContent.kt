@@ -23,17 +23,18 @@ import com.satyajit.threads.utils.toJson
 @ExperimentalCoilApi
 @Composable
 fun ListContent(
+    modifier: Modifier = Modifier,
     items: List<ThreadsDataWithUserData>,
     navHostController: NavHostController,
 ) {
     Log.d("Threads_list", items.size.toString())
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(2.dp),
     ) {
         item {
-            HomeTopBar()
+            //HomeTopBar()
             Spacer(modifier = Modifier.height(2.dp))
 
             if (items.isEmpty()) {
@@ -48,9 +49,9 @@ fun ListContent(
         }
         items(count = items.size) {
             items[it]?.let { threadWithUserData ->
-                ThreadItem(
-                    threadWithUserData,
-                    navHostController,
+                ThreadItems(
+                    threadData = threadWithUserData,
+                    navHostController = navHostController,
                 )
             }
         }

@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,7 +52,9 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.satyajit.threads.R
+import com.satyajit.threads.modals.ThreadsData
 import com.satyajit.threads.modals.ThreadsDataWithUserData
+import com.satyajit.threads.modals.User
 import com.satyajit.threads.navigation.Routes
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -70,7 +73,8 @@ fun ThreadItem(
     ) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .clickable {
                     if (threadData != null) {
                         navHostController.currentBackStackEntry?.savedStateHandle?.set(
@@ -167,7 +171,7 @@ fun ThreadItem(
                                 Image(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(0.8f) ,
+                                        .aspectRatio(0.8f),
                                     painter = rememberAsyncImagePainter(model = imageUrl),
                                     contentDescription = "thread image",
                                     contentScale = ContentScale.Crop
@@ -223,7 +227,7 @@ fun ThreadItem(
                             Icon(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
-                                    .clickable {  },
+                                    .clickable { },
                                 imageVector = Icons.Outlined.Send,
                                 contentDescription = "library"
                             )
@@ -274,5 +278,20 @@ fun ThreadItem(
 @Preview(showBackground = true)
 @Composable
 fun ThreadItemPreview() {
-//    ThreadItem()
+    ThreadItem(
+        threadData = ThreadsDataWithUserData(
+            threads = ThreadsData(
+                "Hello this is a sample text for testing",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7VBSB_51dSkGCEheSAqA1Xx9Tei_Aqs7ALw&s",
+                null,
+                "",
+                "",
+            ),
+            user = User(
+                "Satyajit",
+                "_satya_",
+            )
+        ),
+        navHostController = NavHostController(LocalContext.current)
+    )
 }
