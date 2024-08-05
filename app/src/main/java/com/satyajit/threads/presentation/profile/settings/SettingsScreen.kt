@@ -29,14 +29,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.auth.viewmodel.AuthViewModel
 import com.satyajit.threads.presentation.common.RowItemWithImgAndText
-import com.satyajit.threads.presentation.home.HomeScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

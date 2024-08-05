@@ -26,11 +26,12 @@ fun IconText(
     icon: Painter,
     text: String,
     changeIcon: Boolean = false,
+    liked: Boolean = false,
     onClick: () -> Unit
 ) {
 
     var isLiked by remember {
-        mutableStateOf(false)
+        mutableStateOf(liked)
     }
 
     Row(
@@ -40,16 +41,14 @@ fun IconText(
     ) {
         Icon(
             modifier = Modifier.clickable {
-                isLiked = !isLiked
                 onClick()
+                isLiked = !isLiked
             },
-            painter = if(changeIcon) {
-                if(isLiked){
-                    painterResource(id = R.drawable.ic_heart_filled)
-                } else {
-                    icon
-                }
-            } else icon, contentDescription = "icon"
+            painter = if (changeIcon && isLiked) {
+                painterResource(id = R.drawable.ic_heart_filled)
+            } else {
+                icon
+            }, contentDescription = "icon"
         )
         Text(
             text = text,

@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.satyajit.threads.presentation.common.ThreadItem
+import com.satyajit.threads.presentation.common.ThreadItems
 import com.satyajit.threads.presentation.profile.ProfileScreenViewModel
 import com.satyajit.threads.utils.NetworkResult
 
@@ -67,7 +67,10 @@ fun ThreadsScreen(
                         }
                         items(count = items.size) {
                             items[it]?.let { threadWithUserData ->
-                                ThreadItem(threadWithUserData, navHostController)
+                                ThreadItems(
+                                    threadData = threadWithUserData,
+                                    navHostController = navHostController
+                                )
                             }
                         }
                     }

@@ -5,18 +5,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,26 +32,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.satyajit.threads.R
 import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.navigation.Routes
+import com.satyajit.threads.presentation.home.HomeViewModel
 
 @Composable
 fun ThreadItems(
     modifier: Modifier = Modifier,
     threadData: ThreadsDataWithUserData?,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
+
+    val context = LocalContext.current
+
+    val viewModel: HomeViewModel = hiltViewModel()
 
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
+
+    var isLiked by remember {
+        mutableStateOf(threadData?.isLiked)
+    }
+
+    val likeCount = viewModel.likedCountResult.observeAsState()
 
     Box(
         modifier = Modifier
@@ -61,7 +74,8 @@ fun ThreadItems(
             .padding(vertical = 5.dp, horizontal = 8.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clickable {
                     if (threadData != null) {
                         navHostController.currentBackStackEntry?.savedStateHandle?.set(
@@ -112,7 +126,7 @@ fun ThreadItems(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = "22h",
+                                text = threadData.threads!!.getTimeAgo,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.DarkGray
                             )
@@ -128,28 +142,36 @@ fun ThreadItems(
                             )
                         }
                         //Threads data
-                        Text(
+                        ExpandableText(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 5.dp),
                             text = threadData?.threads!!.threadtxt,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                         threadData.threads.image?.let { imageUrl ->
                             Image(
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
                                     .clip(RoundedCornerShape(5.dp)),
-                                painter = rememberAsyncImagePainter(model = imageUrl),
+                                painter = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(context)
+                                        .data(imageUrl)
+                                        .size(Size.ORIGINAL)
+                                        .crossfade(true)
+                                        .build(),
+                                ),
                                 contentDescription = "thread image",
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Fit
                             )
                         }
                         threadData.threads.video?.let { video ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(10.dp)),
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .wrapContentHeight()
+                                    .aspectRatio(1f),
                             ) {
                                 Exoplayer(
                                     uri = video.toUri(),
@@ -168,9 +190,11 @@ fun ThreadItems(
                                 icon = painterResource(
                                     id = R.drawable.ic_heart
                                 ),
-                                text = "446", // TODO update with likes count
+                                liked = threadData.isLiked,
+                                text = if(likeCount.value==null) threadData.threads.likeCount.toString() else likeCount.value.toString(),
                                 onClick = {
-                                    //TODO
+                                    viewModel.likePost(threadId = threadData.threads.threadId, isLiked = isLiked!!)
+                                    isLiked = !isLiked!!
                                 },
                                 changeIcon = true
                             )
@@ -178,7 +202,7 @@ fun ThreadItems(
                                 icon = painterResource(
                                     id = R.drawable.ic_message
                                 ),
-                                text = "22", // TODO update with likes count
+                                text = "22", // TODO update with replies count
                                 onClick = {
                                     //TODO
                                 },
@@ -187,7 +211,7 @@ fun ThreadItems(
                                 icon = painterResource(
                                     id = R.drawable.ic_repost
                                 ),
-                                text = "18", // TODO update with likes count
+                                text = "18", // TODO update with repost count
                                 onClick = {
                                     //TODO
                                 },

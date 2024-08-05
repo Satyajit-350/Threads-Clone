@@ -51,7 +51,7 @@ fun ListContent(
             items[it]?.let { threadWithUserData ->
                 ThreadItems(
                     threadData = threadWithUserData,
-                    navHostController = navHostController,
+                    navHostController = navHostController
                 )
             }
         }

@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class ThreadsDataWithUserData(
     val threads: ThreadsData?,
-    val user: User?
+    val user: User?,
+    val isLiked: Boolean = false
 ): Parcelable

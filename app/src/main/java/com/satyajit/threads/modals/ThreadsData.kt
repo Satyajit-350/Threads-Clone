@@ -5,11 +5,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ThreadsData(
+    val threadId: String = "",
     val threadtxt: String = "",
     val image: String? = "",
     val video: String? = "",
     val userId: String = "",
-    val timeStamp: String = ""
+    val timeStamp: String = "",
+    val likeCount: Long = 0L,
+    val likedBy: List<String> = emptyList()
 ): Parcelable{
     val getTimeAgo: String get()  {
         val currentTime = System.currentTimeMillis()

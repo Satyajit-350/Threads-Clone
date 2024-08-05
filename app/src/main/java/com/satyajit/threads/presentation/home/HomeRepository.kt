@@ -78,7 +78,11 @@ class HomeRepository @Inject constructor(
                         val userDocument =
                             firebaseFireStore.collection("Users").document(userId).get().await()
                         val userData = userDocument.toObject(User::class.java)
-                        val threadWithUserData = ThreadsDataWithUserData(threadData, userData!!)
+                        val threadWithUserData = ThreadsDataWithUserData(
+                            threadData,
+                            userData!!,
+                            isLiked = threadData.likedBy.contains(firebaseAuth.currentUser?.uid)
+                        )
                         threadsList.add(threadWithUserData)
                     }
                 }
@@ -166,6 +170,40 @@ class HomeRepository @Inject constructor(
         } catch (e: Exception) {
             Log.d("followProfile", "followProfile: ")
             _followOrUnFollowResult.postValue(NetworkResult.Error(e.localizedMessage))
+        }
+    }
+
+    private val _threadLikesLiveData = MutableLiveData<String>()
+    val threadLikesLiveData: LiveData<String> get() = _threadLikesLiveData
+
+    suspend fun likePost(
+        threadId: String,
+        isLiked: Boolean
+    ){
+        try {
+            firebaseAuth.currentUser?.uid.let { userId ->
+                firebaseFireStore.runTransaction { transaction ->
+                    val threadRef = firebaseFireStore.collection("Threads").document(threadId)
+                    val snapshot = transaction.get(threadRef)
+
+                    val currentLikeCount = snapshot.getLong("likeCount") ?: 0L
+                    val newLikeCount = if(isLiked) currentLikeCount - 1 else currentLikeCount + 1
+
+                    transaction.update(threadRef, "likeCount", newLikeCount)
+                    _threadLikesLiveData.postValue(
+                        newLikeCount.toString()
+                    )
+                    if(isLiked){
+                        transaction.update(threadRef, "likedBy", FieldValue.arrayRemove(userId))
+                    }else{
+                        transaction.update(threadRef, "likedBy", FieldValue.arrayUnion(userId))
+                    }
+                }.await()
+            }
+            Log.d("Like Post:", "Like Successful")
+        }catch (e: Exception){
+            e.printStackTrace()
+            Log.d("Like Post:", e.localizedMessage!!)
         }
     }
 

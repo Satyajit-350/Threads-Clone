@@ -7,33 +7,22 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.satyajit.threads.navigation.NavGraph
-import com.satyajit.threads.navigation.Routes
-import com.satyajit.threads.presentation.home.HomeScreenViewModel
+import com.satyajit.threads.presentation.home.HomeViewModel
 import com.satyajit.threads.ui.theme.ThreadsTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel by viewModels<MainViewModel>()
-    private val homeScreenViewModel by viewModels<HomeScreenViewModel>()
+    private val homeScreenViewModel by viewModels<HomeViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

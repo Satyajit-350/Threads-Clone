@@ -35,6 +35,7 @@ class AddThreadsRepository @Inject constructor(
 
     suspend fun uploadThreads(threads: String, imageUri: Uri?, videoUri: Uri?){
         try{
+            val threadRef = firebaseFirestore.collection("Threads").document()
             val time = System.currentTimeMillis()
             val image_url = imageUri?.let {
                 storageReference.child(
@@ -47,18 +48,20 @@ class AddThreadsRepository @Inject constructor(
                 ).putFile(it).await().storage.downloadUrl.await().toString()
             }
             val threadsData = ThreadsData(
+                threadId = threadRef.id,
                 threads,
                 image_url,
                 video_url,
                 firebaseAuth.uid.toString(),
-                System.currentTimeMillis().toString()
+                System.currentTimeMillis().toString(),
+                likeCount = 0,
+                likedBy = emptyList()
             )
-            firebaseDatabase.database.getReference("Threads").child(
-                firebaseDatabase.database.getReference("Threads").push().key!!
-            ).setValue(threadsData).await()
+//            firebaseDatabase.database.getReference("Threads").child(
+//                firebaseDatabase.database.getReference("Threads").push().key!!
+//            ).setValue(threadsData).await()
 
-            firebaseFirestore.collection("Threads").document()
-                .set(threadsData).await()
+            threadRef.set(threadsData).await()
 
             _newThreadsLiveData.postValue(
                 NetworkResult.Success(

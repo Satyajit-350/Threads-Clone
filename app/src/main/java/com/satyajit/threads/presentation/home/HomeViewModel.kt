@@ -1,8 +1,12 @@
 package com.satyajit.threads.presentation.home
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.satyajit.threads.modals.ThreadsData
+import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.modals.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -10,9 +14,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository
 ): ViewModel(){
+
 
     init {
         getAllThreads()
@@ -23,6 +28,8 @@ class HomeScreenViewModel @Inject constructor(
     val threadsListResult = homeRepository.threadsResultLiveData
 
     val followOrUnFollowResult = homeRepository.followOrUnFollowResult
+
+    val likedCountResult = homeRepository.threadLikesLiveData
 
     fun getAllThreads(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -41,6 +48,15 @@ class HomeScreenViewModel @Inject constructor(
 
     fun updateToken(token: String) = viewModelScope.launch(Dispatchers.IO) {
         homeRepository.updateToken(token)
+    }
+
+    fun likePost(
+        threadId: String,
+        isLiked: Boolean
+    ){
+        viewModelScope.launch(Dispatchers.IO){
+            homeRepository.likePost(threadId, isLiked)
+        }
     }
 
 }
