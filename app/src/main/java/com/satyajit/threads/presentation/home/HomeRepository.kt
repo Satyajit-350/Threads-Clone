@@ -35,7 +35,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-@OptIn(ExperimentalSerializationApi::class)
 class HomeRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseFireStore: FirebaseFirestore,
@@ -46,7 +45,10 @@ class HomeRepository @Inject constructor(
 ) {
     private val _threadsResultLiveData =
         MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
-    val threadsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>> get() = _threadsResultLiveData
+    val threadsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>>
+        get() = _threadsResultLiveData
+
+    //pagination
     fun getThreads(): Flow<PagingData<ThreadsData>> {
         return Pager(
             config = PagingConfig(
@@ -81,7 +83,8 @@ class HomeRepository @Inject constructor(
                         val threadWithUserData = ThreadsDataWithUserData(
                             threadData,
                             userData!!,
-                            isLiked = threadData.likedBy.contains(firebaseAuth.currentUser?.uid)
+                            isLiked = threadData.likedBy.contains(firebaseAuth.currentUser?.uid),
+                            isReposted = threadData.repostedBy.contains(firebaseAuth.currentUser?.uid)
                         )
                         threadsList.add(threadWithUserData)
                     }
@@ -100,6 +103,7 @@ class HomeRepository @Inject constructor(
     private var _followOrUnFollowResult = MutableLiveData<NetworkResult<Boolean>>()
     val followOrUnFollowResult: LiveData<NetworkResult<Boolean>>
         get() = _followOrUnFollowResult
+
     suspend fun followOrUnfollowProfile(
         id: String,
         isFollowed: Boolean,
@@ -113,14 +117,17 @@ class HomeRepository @Inject constructor(
                         Pair("profileName", SharedPref.getUserName(context)),
                         Pair("profileImage", SharedPref.getImageUrl(context)),
                         Pair("profileId", firebaseAuth.currentUser?.uid.toString()),
-                        Pair("messageBody", if (!isFollowed) "${SharedPref.getUserName(context)} started following you"
-                        else "${SharedPref.getUserName(context)} unfollowed you")
+                        Pair(
+                            "messageBody",
+                            if (!isFollowed) "${SharedPref.getUserName(context)} started following you"
+                            else "${SharedPref.getUserName(context)} unfollowed you"
+                        )
                     )
                 )
                 launch {
                     firebaseFireStore.collection("Users").document(it).update(
                         "following",
-                        if (isFollowed){
+                        if (isFollowed) {
                             FieldValue.arrayRemove(id)
                         } else {
                             FieldValue.arrayUnion(id)
@@ -128,9 +135,9 @@ class HomeRepository @Inject constructor(
                     ).await()
                     firebaseFireStore.collection("Users").document(user.userId).update(
                         "followers",
-                        if(isFollowed){
+                        if (isFollowed) {
                             FieldValue.arrayRemove(firebaseAuth.currentUser?.uid.toString())
-                        }else{
+                        } else {
                             FieldValue.arrayUnion(firebaseAuth.currentUser?.uid.toString())
                         }
                     ).await()
@@ -179,7 +186,7 @@ class HomeRepository @Inject constructor(
     suspend fun likePost(
         threadId: String,
         isLiked: Boolean
-    ){
+    ) {
         try {
             firebaseAuth.currentUser?.uid.let { userId ->
                 firebaseFireStore.runTransaction { transaction ->
@@ -187,23 +194,56 @@ class HomeRepository @Inject constructor(
                     val snapshot = transaction.get(threadRef)
 
                     val currentLikeCount = snapshot.getLong("likeCount") ?: 0L
-                    val newLikeCount = if(isLiked) currentLikeCount - 1 else currentLikeCount + 1
+                    val newLikeCount = if (isLiked) currentLikeCount - 1 else currentLikeCount + 1
 
                     transaction.update(threadRef, "likeCount", newLikeCount)
                     _threadLikesLiveData.postValue(
                         newLikeCount.toString()
                     )
-                    if(isLiked){
+                    if (isLiked) {
                         transaction.update(threadRef, "likedBy", FieldValue.arrayRemove(userId))
-                    }else{
+                    } else {
                         transaction.update(threadRef, "likedBy", FieldValue.arrayUnion(userId))
                     }
                 }.await()
             }
             Log.d("Like Post:", "Like Successful")
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Log.d("Like Post:", e.localizedMessage!!)
+        }
+    }
+
+
+    //TODO implement the repost count and replies count
+    private val _threadRepostLiveData = MutableLiveData<String>()
+    val threadRepostLiveData: LiveData<String> get() = _threadRepostLiveData
+
+    suspend fun repost(
+        threadId: String,
+        isReposted: Boolean
+    ){
+        try {
+            firebaseAuth.currentUser?.uid.let { userId ->
+                firebaseFireStore.runTransaction { transaction ->
+                    val threadRef = firebaseFireStore.collection("Threads").document(threadId)
+                    val snapshot = transaction.get(threadRef)
+
+                    val repostCount = snapshot.getLong("repostCount") ?: 0L
+                    val newRepostCount = if (isReposted) repostCount - 1 else repostCount + 1
+
+                    transaction.update(threadRef, "repostCount", newRepostCount)
+                    _threadRepostLiveData.postValue(newRepostCount.toString())
+
+                    if(isReposted){
+                        transaction.update(threadRef, "repostedBy", FieldValue.arrayRemove(userId))
+                    }else{
+                        transaction.update(threadRef, "repostedBy", FieldValue.arrayUnion(userId))
+                    }
+                }.await()
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
         }
     }
 

@@ -12,15 +12,23 @@ class ProfileScreenViewModel @Inject constructor(
     private val profileScreenRepository: ProfileScreenRepository
 ): ViewModel() {
 
-    init {
-        getThreads()
-    }
+//    init {
+//        getThreads()
+//    }
 
     val threadsListResult = profileScreenRepository.threadsResultLiveData
 
-    private fun getThreads(){
+    val threadRepostListResult = profileScreenRepository.repostsResultLiveData
+
+    fun getThreads(){
         viewModelScope.launch(Dispatchers.IO) {
             profileScreenRepository.getAllThreads()
+        }
+    }
+
+    fun getAllRepost(){
+        viewModelScope.launch(Dispatchers.IO) {
+            profileScreenRepository.getAllReposts()
         }
     }
 

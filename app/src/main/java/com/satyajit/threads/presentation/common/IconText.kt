@@ -30,10 +30,6 @@ fun IconText(
     onClick: () -> Unit
 ) {
 
-    var isLiked by remember {
-        mutableStateOf(liked)
-    }
-
     Row(
         modifier = Modifier.padding(3.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -42,13 +38,9 @@ fun IconText(
         Icon(
             modifier = Modifier.clickable {
                 onClick()
-                isLiked = !isLiked
             },
-            painter = if (changeIcon && isLiked) {
-                painterResource(id = R.drawable.ic_heart_filled)
-            } else {
-                icon
-            }, contentDescription = "icon"
+            painter = icon,
+            contentDescription = "icon"
         )
         Text(
             text = text,

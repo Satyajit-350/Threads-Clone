@@ -2,6 +2,7 @@ package com.satyajit.threads.presentation.common
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,16 +63,26 @@ fun ThreadItems(
         mutableStateOf(false)
     }
 
+    var showRepostSheet by remember {
+        mutableStateOf(false)
+    }
+
     var isLiked by remember {
         mutableStateOf(threadData?.isLiked)
     }
 
+    var isReposted by remember {
+        mutableStateOf(threadData?.isReposted)
+    }
+
     val likeCount = viewModel.likedCountResult.observeAsState()
+    val repostCount = viewModel.repostCountResult.observeAsState()
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp, horizontal = 8.dp)
+            .background(Color.Transparent)
     ) {
         Column(
             modifier = Modifier
@@ -187,13 +198,19 @@ fun ThreadItems(
                                 .padding(vertical = 8.dp),
                         ) {
                             IconText(
-                                icon = painterResource(
-                                    id = R.drawable.ic_heart
-                                ),
+                                icon = if (isLiked!!) {
+                                    painterResource(id = R.drawable.ic_heart_filled)
+                                } else {
+                                    painterResource(id = R.drawable.ic_heart)
+                                },
                                 liked = threadData.isLiked,
-                                text = if(likeCount.value==null) threadData.threads.likeCount.toString() else likeCount.value.toString(),
+                                text = if (likeCount.value == null) threadData.threads.likeCount.toString()
+                                else likeCount.value.toString(),
                                 onClick = {
-                                    viewModel.likePost(threadId = threadData.threads.threadId, isLiked = isLiked!!)
+                                    viewModel.likePost(
+                                        threadId = threadData.threads.threadId,
+                                        isLiked = isLiked!!
+                                    )
                                     isLiked = !isLiked!!
                                 },
                                 changeIcon = true
@@ -208,12 +225,15 @@ fun ThreadItems(
                                 },
                             )
                             IconText(
-                                icon = painterResource(
-                                    id = R.drawable.ic_repost
-                                ),
-                                text = "18", // TODO update with repost count
+                                icon = if (isReposted!!) {
+                                    painterResource(id = R.drawable.ic_repost_once)
+                                } else {
+                                    painterResource(id = R.drawable.ic_repost)
+                                },
+                                text = if (repostCount.value == null) threadData.threads.repostCount.toString()
+                                else repostCount.value.toString(),
                                 onClick = {
-                                    //TODO
+                                    showRepostSheet = true
                                 },
                             )
                             IconText(
@@ -242,6 +262,21 @@ fun ThreadItems(
         ThreadsOptionsBottomSheet {
             showBottomSheet = false
         }
+    }
+    if (showRepostSheet) {
+        ThreadsRepostBottomSheet(
+            onDismiss = {
+                showRepostSheet = false
+            },
+            onRepostClicked = {
+                viewModel.repost(threadData?.threads!!.threadId, isReposted!!);
+                isReposted = !isReposted!!
+            },
+            onRepostQuotesClicked = {
+                //TODO
+            },
+            isReposted = isReposted!!
+        )
     }
 }
 

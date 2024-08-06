@@ -2,6 +2,7 @@ package com.satyajit.threads.presentation.profile.tab_screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +12,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,8 +43,13 @@ fun ThreadsScreen(
 
     val getThreadsResult by profileViewModel.threadsListResult.observeAsState(null)
 
+    LaunchedEffect(key1 = Unit) {
+        profileViewModel.getThreads()
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize()
+            .background(Color.Transparent)
     ) {
         getThreadsResult?.let { result ->
 
@@ -85,7 +93,6 @@ fun ThreadsScreen(
                 is NetworkResult.Loading -> {
                     true
                 }
-
             }
         }
     }

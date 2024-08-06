@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.satyajit.threads.R
 import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.navigation.Routes
@@ -61,7 +65,6 @@ fun ThreadDetail(
     threadData: ThreadsDataWithUserData?,
     navHostController: NavHostController
 ) {
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -135,6 +138,9 @@ fun ThreadDetail(
 fun GetThreadItem(
     threadData: ThreadsDataWithUserData?
 ) {
+
+    val context = LocalContext.current
+
     threadData?.let { data ->
         Column(
             modifier = Modifier
@@ -189,11 +195,17 @@ fun GetThreadItem(
             data.threads?.image?.let { imageUrl ->
                 Image(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(350.dp),
-                    painter = rememberAsyncImagePainter(model = imageUrl),
+                        .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
+                        .clip(RoundedCornerShape(5.dp)),
+                    painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(context)
+                            .data(imageUrl)
+                            .size(Size.ORIGINAL)
+                            .crossfade(true)
+                            .build(),
+                    ),
                     contentDescription = "thread image",
-                    contentScale = ContentScale.FillHeight
+                    contentScale = ContentScale.Fit
                 )
             }
 

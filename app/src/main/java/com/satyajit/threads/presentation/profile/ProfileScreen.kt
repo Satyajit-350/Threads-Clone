@@ -453,7 +453,10 @@ fun TabContent(
             }
 
             2 -> {
-                RepostScreen()
+                RepostScreen(
+                    navHostController = navController,
+                    scrollState = scrollState
+                )
             }
         }
     }

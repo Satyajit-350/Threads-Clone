@@ -31,6 +31,8 @@ class HomeViewModel @Inject constructor(
 
     val likedCountResult = homeRepository.threadLikesLiveData
 
+    val repostCountResult = homeRepository.threadRepostLiveData
+
     fun getAllThreads(){
         viewModelScope.launch(Dispatchers.IO) {
             homeRepository.getAllThreads()
@@ -56,6 +58,15 @@ class HomeViewModel @Inject constructor(
     ){
         viewModelScope.launch(Dispatchers.IO){
             homeRepository.likePost(threadId, isLiked)
+        }
+    }
+
+    fun repost(
+        threadId: String,
+        isReposted: Boolean
+    ){
+        viewModelScope.launch(Dispatchers.IO){
+            homeRepository.repost(threadId, isReposted)
         }
     }
 

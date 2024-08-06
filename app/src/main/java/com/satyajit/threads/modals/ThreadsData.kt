@@ -12,6 +12,8 @@ data class ThreadsData(
     val userId: String = "",
     val timeStamp: String = "",
     val likeCount: Long = 0L,
+    val repostCount: Long = 0L,
+    val repostedBy: List<String> = emptyList(),
     val likedBy: List<String> = emptyList()
 ): Parcelable{
     val getTimeAgo: String get()  {

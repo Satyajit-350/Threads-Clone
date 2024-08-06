@@ -67,4 +67,44 @@ class ProfileScreenRepository @Inject constructor(
         //TODO
     }
 
+    private val _repostsResultLiveData =
+        MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
+    val repostsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>> get() = _repostsResultLiveData
+
+    suspend fun getAllReposts(){
+        _repostsResultLiveData.postValue(NetworkResult.Loading())
+        try{
+            firebaseAuth.currentUser?.uid.let { currUserId ->
+                val threadsList = ArrayList<ThreadsDataWithUserData>()
+                val threadsResponse = firebaseFireStore
+                    .collection("Threads")
+                    .whereArrayContains("repostedBy", currUserId!!)
+                    .get()
+                    .await()
+
+                if (!threadsResponse.isEmpty) {
+                    threadsResponse.documents.forEach { threadDocument ->
+                        val thread = threadDocument.toObject(ThreadsData::class.java)
+                        thread?.let { threadData ->
+
+                            val userId = threadData.userId
+                            val userDocument =
+                                firebaseFireStore.collection("Users").document(userId).get().await()
+                            val userData = userDocument.toObject(User::class.java)
+
+                            val threadWithUserData = ThreadsDataWithUserData(threadData, userData!!)
+                            threadsList.add(threadWithUserData)
+                        }
+                    }
+                    Log.d("ThreadsRepostedByCurrentUser", "getCurrentUserRepostedThreads: $threadsList")
+                    _repostsResultLiveData.postValue(NetworkResult.Success(threadsList))
+                } else {
+                    Log.d("ThreadsRepostedByCurrentUser", "getCurrentUserRepostedThreads: Empty")
+                    _repostsResultLiveData.postValue(NetworkResult.Success(threadsList))
+                }
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
 }

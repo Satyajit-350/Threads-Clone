@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -72,6 +73,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
@@ -427,22 +430,25 @@ fun AddThreadScreen(navController: NavHostController) {
                             }
                         }
                         else {
-
-                            val painter = rememberAsyncImagePainter(model = imageUri)
-
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .wrapContentWidth()
                                     .clip(RoundedCornerShape(8.dp))
                                     .shadow(0.dp, shape = RoundedCornerShape(8.dp))
                             ) {
                                 Image(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(0.8f),
-                                    painter = painter,
+                                        .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
+                                        .clip(RoundedCornerShape(5.dp)),
+                                    painter = rememberAsyncImagePainter(
+                                        model = ImageRequest.Builder(context)
+                                            .data(imageUri)
+                                            .size(Size.ORIGINAL)
+                                            .crossfade(true)
+                                            .build(),
+                                    ),
                                     contentDescription = "thread image",
-                                    contentScale = ContentScale.FillBounds
+                                    contentScale = ContentScale.Fit
                                 )
 
                                 IconButton(
