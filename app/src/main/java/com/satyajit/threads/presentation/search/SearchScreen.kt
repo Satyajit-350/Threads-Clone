@@ -71,7 +71,7 @@ fun SearchScreen(
     }
 
     LaunchedEffect(refreshing) {
-        if(refreshing){
+        if (refreshing) {
             delay(1000)
             refreshing = false
         }
@@ -113,7 +113,8 @@ fun SearchScreen(
                             onRefresh = {
                                 refreshing = true
                                 searchViewModel.getAllUsers()
-                            }) {
+                            }
+                        ) {
                             LazyColumn(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentPadding = PaddingValues(5.dp),
@@ -124,7 +125,11 @@ fun SearchScreen(
                                 }
                                 Log.d("followersLogs", SharedPref.getUserId(context)).toString()
                                 items(filterItems) { users ->
-                                    val isFollowedState = remember { mutableStateOf(users.followers.contains(SharedPref.getUserId(context))) }
+                                    val isFollowedState = remember {
+                                        mutableStateOf(
+                                            users.followers.contains(SharedPref.getUserId(context))
+                                        )
+                                    }
                                     UserItem(
                                         user = users,
                                         isFollowed = isFollowedState,
@@ -160,7 +165,7 @@ fun SearchTopAppBar(
     scrollState: LazyListState
 ) {
     AnimatedVisibility(
-        visible = scrollState.firstVisibleItemScrollOffset==0,
+        visible = scrollState.firstVisibleItemScrollOffset == 0,
         enter = expandVertically(),
         exit = shrinkVertically()
     ) {

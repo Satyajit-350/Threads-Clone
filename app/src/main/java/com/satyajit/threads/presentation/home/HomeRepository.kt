@@ -104,6 +104,7 @@ class HomeRepository @Inject constructor(
     val followOrUnFollowResult: LiveData<NetworkResult<Boolean>>
         get() = _followOrUnFollowResult
 
+    @OptIn(ExperimentalSerializationApi::class)
     suspend fun followOrUnfollowProfile(
         id: String,
         isFollowed: Boolean,
