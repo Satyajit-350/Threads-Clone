@@ -13,8 +13,11 @@ data class ThreadsData(
     val timeStamp: String = "",
     val likeCount: Long = 0L,
     val repostCount: Long = 0L,
+    val replyCount: Int = 0,
+    val repliedBy: List<String> = emptyList(),
     val repostedBy: List<String> = emptyList(),
-    val likedBy: List<String> = emptyList()
+    val likedBy: List<String> = emptyList(),
+    val replies: List<ThreadsData> = emptyList()
 ): Parcelable{
     val getTimeAgo: String get()  {
         val currentTime = System.currentTimeMillis()

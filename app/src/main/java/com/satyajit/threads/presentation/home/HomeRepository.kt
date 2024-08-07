@@ -100,6 +100,47 @@ class HomeRepository @Inject constructor(
         }
     }
 
+    private val _repliesResultLiveData = MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
+    val repliesResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>> get() = _repliesResultLiveData
+
+    suspend fun getAllReplies(threadId: String){
+        _repliesResultLiveData.postValue(NetworkResult.Loading())
+        try{
+            val repliesList = ArrayList<ThreadsDataWithUserData>()
+            val repliesResponse = firebaseFireStore
+                .collection("Threads")
+                .document(threadId)
+                .collection("Replies")
+                .get().await()
+
+            if (!repliesResponse.isEmpty) {
+                repliesResponse.documents.forEach { replyDocument ->
+                    val reply = replyDocument.toObject(ThreadsData::class.java)
+                    reply?.let { replyData ->
+                        val userId = replyData.userId
+                        val userDocument = firebaseFireStore.collection("Users").document(userId).get().await()
+                        val userData = userDocument.toObject(User::class.java)
+                        val replyWithUserData = ThreadsDataWithUserData(
+                            replyData,
+                            userData!!,
+                            isLiked = replyData.likedBy.contains(firebaseAuth.currentUser?.uid),
+                            isReposted = replyData.repostedBy.contains(firebaseAuth.currentUser?.uid)
+                        )
+                        repliesList.add(replyWithUserData)
+                    }
+                }
+                Log.d("AllReplies", "getAllReplies: $repliesList")
+                _repliesResultLiveData.postValue(NetworkResult.Success(repliesList))
+            } else {
+                Log.d("AllReplies", "getAllReplies: Empty")
+                _repliesResultLiveData.postValue(NetworkResult.Success(repliesList))
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+            _repliesResultLiveData.postValue(NetworkResult.Error(e.localizedMessage))
+        }
+    }
+
     private var _followOrUnFollowResult = MutableLiveData<NetworkResult<Boolean>>()
     val followOrUnFollowResult: LiveData<NetworkResult<Boolean>>
         get() = _followOrUnFollowResult
@@ -112,19 +153,16 @@ class HomeRepository @Inject constructor(
     ) = coroutineScope {
         try {
             firebaseAuth.currentUser?.uid?.let {
-                val body = Json.encodeToString(
-                    mapOf(
-                        Pair("type", "FOLLOW"),
-                        Pair("profileName", SharedPref.getUserName(context)),
-                        Pair("profileImage", SharedPref.getImageUrl(context)),
-                        Pair("profileId", firebaseAuth.currentUser?.uid.toString()),
-                        Pair(
-                            "messageBody",
-                            if (!isFollowed) "${SharedPref.getUserName(context)} started following you"
-                            else "${SharedPref.getUserName(context)} unfollowed you"
-                        )
-                    )
+                val notificationData = mapOf(
+                    "type" to "FOLLOW",
+                    "profileName" to SharedPref.getUserName(context),
+                    "profileImage" to SharedPref.getImageUrl(context),
+                    "profileId" to firebaseAuth.currentUser?.uid.toString(),
+                    "messageBody" to  if (!isFollowed) "${SharedPref.getUserName(context)} started following you"
+                    else "${SharedPref.getUserName(context)} unfollowed you"
                 )
+                val body = Json.encodeToString(notificationData)
+
                 launch {
                     firebaseFireStore.collection("Users").document(it).update(
                         "following",

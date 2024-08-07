@@ -46,6 +46,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -269,7 +270,7 @@ fun AddThreadScreen(navController: NavHostController) {
 
                         Image(
                             modifier = Modifier
-                                .size(50.dp)
+                                .size(40.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop,
                             painter = if (SharedPref.getImageUrl(context) != "")
@@ -295,9 +296,7 @@ fun AddThreadScreen(navController: NavHostController) {
                                 .clip(CircleShape)
                                 .background(Color.LightGray)
                         )
-
                     }
-
 
                     Spacer(modifier = Modifier.width(5.dp))
 
@@ -310,9 +309,9 @@ fun AddThreadScreen(navController: NavHostController) {
                         Text(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
+                                .padding(horizontal = 5.dp),
                             text = SharedPref.getUserName(context),
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.bodyMedium
                         )
 
                         BasicTextFiledWithHint(
@@ -565,7 +564,7 @@ private fun Header(
 
             Text(
                 text = "New thread",
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Start
             )

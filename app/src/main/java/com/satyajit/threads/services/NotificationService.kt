@@ -33,7 +33,7 @@ class NotificationService: FirebaseMessagingService() {
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
-
+    
     @OptIn(ExperimentalSerializationApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(message: RemoteMessage) {
@@ -61,7 +61,15 @@ class NotificationService: FirebaseMessagingService() {
             pendingIntent = PendingIntent.getActivity(this, 2, resultIntent, PendingIntent.FLAG_IMMUTABLE)
             builder.setContentIntent(pendingIntent)
         }
-        builder.setSmallIcon(R.mipmap.ic_launcher)
+        else if(body["type"] == "THREAD_REPLY"){
+            builder.setContentText(body["messageBody"])
+            resultIntent = Intent(this, MainActivity::class.java)
+            pendingIntent = PendingIntent.getActivity(this, 3, resultIntent, PendingIntent.FLAG_IMMUTABLE)
+            builder.setContentIntent(pendingIntent)
+        }else if(body["type"] == "THREAD_REPOST"){
+            //TODO
+        }
+        builder.setSmallIcon(R.drawable.threads_logo)
         builder.setAutoCancel(true)
 
         val mNotificationManager =

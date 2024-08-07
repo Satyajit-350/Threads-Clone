@@ -30,9 +30,7 @@ fun ListContent(
         contentPadding = PaddingValues(2.dp),
     ) {
         item {
-            //HomeTopBar()
             Spacer(modifier = Modifier.height(2.dp))
-
             if (items.isEmpty()) {
                 Text(
                     modifier = Modifier

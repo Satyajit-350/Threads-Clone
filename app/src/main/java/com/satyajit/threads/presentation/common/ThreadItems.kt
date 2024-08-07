@@ -75,8 +75,9 @@ fun ThreadItems(
         mutableStateOf(threadData?.isReposted)
     }
 
-    val likeCount = viewModel.likedCountResult.observeAsState()
-    val repostCount = viewModel.repostCountResult.observeAsState()
+    val likeCount by viewModel.likedCountResult.observeAsState()
+    val repostCount by viewModel.repostCountResult.observeAsState()
+    val replyCount by viewModel.repliesCount.observeAsState()
 
     Box(
         modifier = Modifier
@@ -145,7 +146,6 @@ fun ThreadItems(
                             Image(
                                 modifier = Modifier
                                     .clickable {
-                                        //Open the bottom sheet
                                         showBottomSheet = true
                                     },
                                 imageVector = Icons.Rounded.MoreHoriz,
@@ -204,8 +204,8 @@ fun ThreadItems(
                                     painterResource(id = R.drawable.ic_heart)
                                 },
                                 liked = threadData.isLiked,
-                                text = if (likeCount.value == null) threadData.threads.likeCount.toString()
-                                else likeCount.value.toString(),
+                                text = if (likeCount == null) threadData.threads.likeCount.toString()
+                                else likeCount.toString(),
                                 onClick = {
                                     viewModel.likePost(
                                         threadId = threadData.threads.threadId,
@@ -219,9 +219,14 @@ fun ThreadItems(
                                 icon = painterResource(
                                     id = R.drawable.ic_message
                                 ),
-                                text = "22", // TODO update with replies count
+                                text = if (replyCount == null) threadData.threads.replyCount.toString()
+                                else replyCount.toString(),
                                 onClick = {
-                                    //TODO
+                                    navHostController.currentBackStackEntry?.savedStateHandle?.set(
+                                        key = "threads",
+                                        value = threadData
+                                    )
+                                    navHostController.navigate(Routes.ThreadReply.route)
                                 },
                             )
                             IconText(
@@ -230,8 +235,8 @@ fun ThreadItems(
                                 } else {
                                     painterResource(id = R.drawable.ic_repost)
                                 },
-                                text = if (repostCount.value == null) threadData.threads.repostCount.toString()
-                                else repostCount.value.toString(),
+                                text = if (repostCount == null) threadData.threads.repostCount.toString()
+                                else repostCount.toString(),
                                 onClick = {
                                     showRepostSheet = true
                                 },

@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import com.satyajit.threads.modals.ThreadsData
 import com.satyajit.threads.modals.ThreadsDataWithUserData
 import com.satyajit.threads.modals.User
+import com.satyajit.threads.presentation.reply.ReplyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+    private val homeRepository: HomeRepository,
+    private val replyRepository: ReplyRepository
 ): ViewModel(){
 
 
@@ -33,11 +35,22 @@ class HomeViewModel @Inject constructor(
 
     val repostCountResult = homeRepository.threadRepostLiveData
 
+    val getAllReplies = homeRepository.repliesResultLiveData
+
+    val repliesCount = replyRepository.countRepliesLiveData
+
     fun getAllThreads(){
         viewModelScope.launch(Dispatchers.IO) {
             homeRepository.getAllThreads()
         }
     }
+
+    fun getAllReplies(threadId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            homeRepository.getAllReplies(threadId)
+        }
+    }
+
     fun followOrUnfollow(
         id:String,
         isFollowed: Boolean,
