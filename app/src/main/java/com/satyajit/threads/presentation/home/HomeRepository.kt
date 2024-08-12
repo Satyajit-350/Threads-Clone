@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -11,10 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.StorageReference
-import com.satyajit.threads.data.paging.ThreadsPagingSource
+import com.satyajit.threads.data.local.database.ThreadsDatabase
+import com.satyajit.threads.data.paging.ThreadsRemoteMediator
 import com.satyajit.threads.modals.Notification
 import com.satyajit.threads.modals.NotificationBody
 import com.satyajit.threads.modals.NotificationItem
@@ -40,22 +41,26 @@ class HomeRepository @Inject constructor(
     private val firebaseFireStore: FirebaseFirestore,
     private val firebaseStorage: StorageReference,
     private val firebaseDatabase: DatabaseReference,
+    private val threadsDatabase: ThreadsDatabase,
     private val fcmNotificationRepository: FCMNotificationRepository,
     @ApplicationContext val context: Context,
 ) {
     //pagination
+    @OptIn(ExperimentalPagingApi::class)
     fun getThreads(): Flow<PagingData<ThreadsDataWithUserData>> {
+        val pagingSourceFactory = { threadsDatabase.threadsDao().getThreads() }
+
         return Pager(
             config = PagingConfig(
                 pageSize = 5,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = {
-                ThreadsPagingSource(
-                    firebaseFireStore = firebaseFireStore,
-                    firebaseAuth = firebaseAuth,
-                )
-            }
+            remoteMediator = ThreadsRemoteMediator(
+                firebaseFireStore = firebaseFireStore,
+                firebaseAuth = firebaseAuth,
+                threadsDatabase = threadsDatabase
+            ),
+            pagingSourceFactory = pagingSourceFactory
         ).flow
     }
 
@@ -80,8 +85,8 @@ class HomeRepository @Inject constructor(
                         val userDocument = firebaseFireStore.collection("Users").document(userId).get().await()
                         val userData = userDocument.toObject(User::class.java)
                         val replyWithUserData = ThreadsDataWithUserData(
-                            replyData,
-                            userData!!,
+                            threads = replyData,
+                            user = userData!!,
                             isLiked = replyData.likedBy.contains(firebaseAuth.currentUser?.uid),
                             isReposted = replyData.repostedBy.contains(firebaseAuth.currentUser?.uid)
                         )

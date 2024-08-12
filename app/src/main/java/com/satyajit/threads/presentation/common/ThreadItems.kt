@@ -163,35 +163,39 @@ fun ThreadItems(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         threadData.threads.image?.let { imageUrl ->
-                            Image(
-                                modifier = Modifier
-                                    .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
-                                    .clip(RoundedCornerShape(5.dp)),
-                                painter = rememberAsyncImagePainter(
-                                    model = ImageRequest.Builder(context)
-                                        .data(imageUrl)
-                                        .size(Size.ORIGINAL)
-                                        .crossfade(true)
-                                        .build(),
-                                ),
-                                contentDescription = "thread image",
-                                contentScale = ContentScale.Fit
-                            )
+                            if(imageUrl.isNotEmpty()){
+                                Image(
+                                    modifier = Modifier
+                                        .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
+                                        .clip(RoundedCornerShape(5.dp)),
+                                    painter = rememberAsyncImagePainter(
+                                        model = ImageRequest.Builder(context)
+                                            .data(imageUrl)
+                                            .size(Size.ORIGINAL)
+                                            .crossfade(true)
+                                            .build(),
+                                    ),
+                                    contentDescription = "thread image",
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
                         }
                         threadData.threads.video?.let { video ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .wrapContentHeight()
-                                    .aspectRatio(1f),
-                            ) {
-                                Exoplayer(
-                                    uri = video.toUri(),
-                                    onRemove = {},
-                                    showController = true,
-                                    showRemoveBtn = false
-                                )
+                            if(video.isNotEmpty()){
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .wrapContentHeight()
+                                        .aspectRatio(1f),
+                                ) {
+                                    Exoplayer(
+                                        uri = video.toUri(),
+                                        onRemove = {},
+                                        showController = true,
+                                        showRemoveBtn = false
+                                    )
+                                }
                             }
                         }
                         Row(

@@ -48,7 +48,10 @@ class ProfileScreenRepository @Inject constructor(
                             firebaseFireStore.collection("Users").document(userId).get().await()
                         val userData = userDocument.toObject(User::class.java)
 
-                        val threadWithUserData = ThreadsDataWithUserData(threadData, userData!!)
+                        val threadWithUserData = ThreadsDataWithUserData(
+                            threads = threadData,
+                            user = userData!!
+                        )
                         threadsList.add(threadWithUserData)
                     }
                 }
@@ -92,7 +95,8 @@ class ProfileScreenRepository @Inject constructor(
                                 firebaseFireStore.collection("Users").document(userId).get().await()
                             val userData = userDocument.toObject(User::class.java)
 
-                            val threadWithUserData = ThreadsDataWithUserData(threadData, userData!!)
+                            val threadWithUserData = ThreadsDataWithUserData(
+                                threads = threadData, user = userData!!)
                             threadsList.add(threadWithUserData)
                         }
                     }

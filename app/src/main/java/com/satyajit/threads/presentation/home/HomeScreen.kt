@@ -60,15 +60,12 @@ fun HomeScreen(
     val lines = remember {
         path.asAndroidPath().flatten(error = 0.5f).toList()
     }
-    val scope = rememberCoroutineScope()
+
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
+        refreshing = getAllThreadsResult.loadState.refresh is LoadState.Loading,
         refreshThreshold = 50.dp,
         onRefresh = {
-            scope.launch {
-                isRefreshing = true
-                getAllThreadsResult.refresh()
-            }
+            getAllThreadsResult.refresh()
         }
     )
     val pullCompleted by remember {
@@ -77,22 +74,24 @@ fun HomeScreen(
         }
     }
 
-    val (offsetYAnimation, alphaAnimation, scaleAnimation) = rememberAnimations(isRefreshing, pullRefreshState.progress)
+    val (offsetYAnimation, alphaAnimation, scaleAnimation) = rememberAnimations(getAllThreadsResult.loadState.refresh is LoadState.Loading, pullRefreshState.progress)
     val (pathBackAndForthAnimationOnRefreshing, scaleAnimationOnPullCompleted) = rememberAnimationControllers()
 
     val hapticFeedback = LocalHapticFeedback.current
     handleRefreshAnimation(pullCompleted, scaleAnimationOnPullCompleted, hapticFeedback)
-    handleLoadingState(getAllThreadsResult.loadState, isRefreshing = { refreshing ->
-        isRefreshing = refreshing
-    })
+//    handleLoadingState(getAllThreadsResult.loadState, isRefreshing = { refreshing ->
+//        isRefreshing = refreshing
+//    })
 
-    LaunchedEffect(isRefreshing) {
-        if (isRefreshing) {
+    LaunchedEffect(getAllThreadsResult.loadState.refresh) {
+        val refreshState = getAllThreadsResult.loadState.refresh
+        if (refreshState is LoadState.Loading) {
             pathBackAndForthAnimationOnRefreshing.animateTo(
                 targetValue = 1f,
                 animationSpec = infiniteRepeatable(tween(2000), repeatMode = RepeatMode.Reverse)
             )
-        } else {
+        } else if (refreshState is LoadState.NotLoading) {
+            // Refresh complete, reset isRefreshing
             pathBackAndForthAnimationOnRefreshing.snapTo(0f)
         }
     }

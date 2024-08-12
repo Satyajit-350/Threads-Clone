@@ -320,36 +320,40 @@ fun GetThreadItem(
             )
 
             data.threads?.image?.let { imageUrl ->
-                Image(
-                    modifier = Modifier
-                        .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
-                        .clip(RoundedCornerShape(5.dp)),
-                    painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(context)
-                            .data(imageUrl)
-                            .size(Size.ORIGINAL)
-                            .crossfade(true)
-                            .build(),
-                    ),
-                    contentDescription = "thread image",
-                    contentScale = ContentScale.Fit
-                )
+                if(imageUrl.isNotEmpty()){
+                    Image(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
+                            .clip(RoundedCornerShape(5.dp)),
+                        painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(context)
+                                .data(imageUrl)
+                                .size(Size.ORIGINAL)
+                                .crossfade(true)
+                                .build(),
+                        ),
+                        contentDescription = "thread image",
+                        contentScale = ContentScale.Fit
+                    )
+                }
             }
 
-            data.threads?.video?.let {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .wrapContentHeight()
-                        .aspectRatio(1f),
-                ) {
-                    Exoplayer(
-                        uri = data.threads.video.toUri(),
-                        onRemove = {},
-                        showController = true,
-                        showRemoveBtn = false
-                    )
+            data.threads?.video?.let { video ->
+                if(video.isNotEmpty()){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .wrapContentHeight()
+                            .aspectRatio(1f),
+                    ) {
+                        Exoplayer(
+                            uri = video.toUri(),
+                            onRemove = {},
+                            showController = true,
+                            showRemoveBtn = false
+                        )
+                    }
                 }
             }
 
