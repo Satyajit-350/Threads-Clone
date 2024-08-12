@@ -40,7 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.disk.DiskCache
 import coil.request.ImageRequest
 import coil.size.Size
 import com.satyajit.threads.R
@@ -274,7 +276,7 @@ fun ThreadItems(
                 showRepostSheet = false
             },
             onRepostClicked = {
-                viewModel.repost(threadData?.threads!!.threadId, isReposted!!);
+                viewModel.repost(threadData?.threads!!.threadId, isReposted!!)
                 isReposted = !isReposted!!
             },
             onRepostQuotesClicked = {

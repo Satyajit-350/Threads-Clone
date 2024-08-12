@@ -41,7 +41,8 @@ fun ReloadAnim(
         modifier = modifier
             .width(IntrinsicSize.Min)
             .height(50.dp)
-            .padding(end = 60.dp),
+            .padding(end = 55.dp),
+        contentAlignment = Alignment.TopCenter,
     ) {
         Canvas(
             modifier = Modifier
@@ -83,7 +84,7 @@ fun ReloadAnim(
                     scaleY = scaleAnimation
                 },
             onDraw = {
-                val currentLength = (lines.size * (minOf(1f, pullRefreshState.progress - 0.15f))).toInt()
+                val currentLength = (lines.size * (minOf(1f, pullRefreshState.progress - 0.30f))).toInt()
                 if (currentLength < 0) return@Canvas
                 val minIndex = when {
                     currentLength - 10 < 0 -> 0

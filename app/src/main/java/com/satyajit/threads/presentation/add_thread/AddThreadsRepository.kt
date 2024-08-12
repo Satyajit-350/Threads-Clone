@@ -3,6 +3,7 @@ package com.satyajit.threads.presentation.add_thread
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -81,14 +82,13 @@ class AddThreadsRepository @Inject constructor(
                 .await()
                 .get("followers") as? List<String> ?: emptyList()
 
-            val notificationBody = "${SharedPref.getUserName(context)} uploaded a new thread."
-
             followers.forEach { followerId ->
                 val followerDocument =
                     firebaseFirestore.collection("Users").document(followerId).get().await()
                 val followerUser = followerDocument.toObject(User::class.java)
 
                 followerUser?.let { user ->
+                    Log.d("Notification sent to", "User ID: ${user.userId}, Token: ${user.notificationToken}")
                     val notificationData = mapOf(
                         "type" to "THREAD_UPLOAD",
                         "profileName" to SharedPref.getUserName(context),

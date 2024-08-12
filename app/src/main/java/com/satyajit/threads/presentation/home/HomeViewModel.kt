@@ -20,14 +20,7 @@ class HomeViewModel @Inject constructor(
     private val replyRepository: ReplyRepository
 ): ViewModel(){
 
-
-    init {
-        getAllThreads()
-    }
-
     val getAllThreads = homeRepository.getThreads().cachedIn(viewModelScope)
-
-    val threadsListResult = homeRepository.threadsResultLiveData
 
     val followOrUnFollowResult = homeRepository.followOrUnFollowResult
 
@@ -39,11 +32,6 @@ class HomeViewModel @Inject constructor(
 
     val repliesCount = replyRepository.countRepliesLiveData
 
-    fun getAllThreads(){
-        viewModelScope.launch(Dispatchers.IO) {
-            homeRepository.getAllThreads()
-        }
-    }
 
     fun getAllReplies(threadId: String){
         viewModelScope.launch(Dispatchers.IO) {

@@ -43,61 +43,20 @@ class HomeRepository @Inject constructor(
     private val fcmNotificationRepository: FCMNotificationRepository,
     @ApplicationContext val context: Context,
 ) {
-    private val _threadsResultLiveData =
-        MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
-    val threadsResultLiveData: LiveData<NetworkResult<List<ThreadsDataWithUserData>>>
-        get() = _threadsResultLiveData
-
     //pagination
-    fun getThreads(): Flow<PagingData<ThreadsData>> {
+    fun getThreads(): Flow<PagingData<ThreadsDataWithUserData>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 10,
+                pageSize = 5,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
                 ThreadsPagingSource(
-                    firebaseFireStore,
-                    context
+                    firebaseFireStore = firebaseFireStore,
+                    firebaseAuth = firebaseAuth,
                 )
             }
         ).flow
-    }
-
-    suspend fun getAllThreads() {
-        _threadsResultLiveData.postValue(NetworkResult.Loading())
-        try {
-            val threadsList = ArrayList<ThreadsDataWithUserData>()
-            val threadsResponse = firebaseFireStore
-                .collection("Threads")
-                .orderBy("timeStamp", Query.Direction.DESCENDING)
-                .get().await()
-            if (!threadsResponse.isEmpty) {
-                threadsResponse.documents.forEach { threadDocument ->
-                    val thread = threadDocument.toObject(ThreadsData::class.java)
-                    thread?.let { threadData ->
-                        val userId = threadData.userId
-                        val userDocument =
-                            firebaseFireStore.collection("Users").document(userId).get().await()
-                        val userData = userDocument.toObject(User::class.java)
-                        val threadWithUserData = ThreadsDataWithUserData(
-                            threadData,
-                            userData!!,
-                            isLiked = threadData.likedBy.contains(firebaseAuth.currentUser?.uid),
-                            isReposted = threadData.repostedBy.contains(firebaseAuth.currentUser?.uid)
-                        )
-                        threadsList.add(threadWithUserData)
-                    }
-                }
-                Log.d("AllThreadsOfUser", "getAllThreads: $threadsList")
-                _threadsResultLiveData.postValue(NetworkResult.Success(threadsList))
-            } else {
-                Log.d("AllPostsOfUser", "getAllPosts: Empty")
-                _threadsResultLiveData.postValue(NetworkResult.Success(threadsList))
-            }
-        } catch (e: Exception) {
-            _threadsResultLiveData.postValue(NetworkResult.Error(e.localizedMessage))
-        }
     }
 
     private val _repliesResultLiveData = MutableLiveData<NetworkResult<List<ThreadsDataWithUserData>>>()
@@ -253,8 +212,6 @@ class HomeRepository @Inject constructor(
         }
     }
 
-
-    //TODO implement the repost count and replies count
     private val _threadRepostLiveData = MutableLiveData<String>()
     val threadRepostLiveData: LiveData<String> get() = _threadRepostLiveData
 
