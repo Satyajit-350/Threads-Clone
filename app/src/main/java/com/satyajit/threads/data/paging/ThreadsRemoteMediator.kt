@@ -35,8 +35,8 @@ class ThreadsRemoteMediator(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val lastItem = state.lastItemOrNull()
-                    lastItem?.threads?.timeStamp?.let { threadId ->
-                        query.startAfter(threadId).get().await()
+                    lastItem?.threads?.timeStamp?.let { timeStamp ->
+                        query.startAfter(timeStamp).get().await()
                     } ?: query.get().await()
                 }
             }
