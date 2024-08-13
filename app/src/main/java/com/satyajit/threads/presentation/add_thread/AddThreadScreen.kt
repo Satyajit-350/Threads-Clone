@@ -1,7 +1,5 @@
 package com.satyajit.threads.presentation.add_thread
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,24 +24,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.outlined.GifBox
-import androidx.compose.material.icons.outlined.Mic
-import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material.icons.outlined.Segment
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,29 +46,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.common.BasicTextFiledWithHint
-import com.satyajit.threads.presentation.common.Exoplayer
+import com.satyajit.threads.presentation.common.MediaSelector
 import com.satyajit.threads.utils.NetworkResult
+import com.satyajit.threads.utils.PermissionManager
 import com.satyajit.threads.utils.SharedPref
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -93,19 +77,13 @@ fun AddThreadScreen(navController: NavHostController) {
 
     val threadsUploadResult by addThreadsViewModel.threadsUploadResult.observeAsState(null)
 
-    var isEnabled by remember {
-        mutableStateOf(false)
-    }
+    var isEnabled by remember { mutableStateOf(false) }
 
     var isLoading by remember { mutableStateOf(false) }
 
-    var expanded by remember {
-        mutableStateOf(false)
-    }
+    var expanded by remember { mutableStateOf(false) }
 
-    var visibilityText by remember {
-        mutableStateOf("Anyone can reply")
-    }
+    var visibilityText by remember { mutableStateOf("Anyone can reply") }
 
     val visibilityContent = listOf(
         "Anyone can reply",
@@ -113,74 +91,22 @@ fun AddThreadScreen(navController: NavHostController) {
         "Mentioned only"
     )
 
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var videoUri by remember { mutableStateOf<Uri?>(null) }
+    var audioUri by remember { mutableStateOf<Uri?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
-    var videoUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    val videoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        videoUri = uri
-    }
-
-    var audioUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    val audioLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        audioUri = uri
-    }
-
-    val permissionToRequest = mutableListOf<String>()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        permissionToRequest.add(
-            Manifest.permission.READ_MEDIA_IMAGES,
-        )
-        permissionToRequest.add(
-            Manifest.permission.READ_MEDIA_VIDEO,
-        )
-        permissionToRequest.add(
-            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-        )
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        permissionToRequest.add(
-            Manifest.permission.READ_MEDIA_IMAGES,
-        )
-        permissionToRequest.add(
-            Manifest.permission.READ_MEDIA_VIDEO,
-        )
-    } else {
-        permissionToRequest.add(
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
-            val allGranted = permissions.all { it.value }
-            if (allGranted) {
-                launcher.launch("image/*")
-            } else {
-                Toast.makeText(
-                    context,
-                    "Permissions Not Granted!! Please grant permissions",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+    val permissions = PermissionManager.getPermissionRequest()
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> imageUri = uri }
+    val videoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> videoUri = uri }
+    val audioLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> audioUri = uri }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permission ->
+        val allGranted = permission.all { it.value }
+        if (allGranted) {
+            launcher.launch("image/*")
+        } else {
+            Toast.makeText(context, "Permissions Not Granted!! Please grant permissions", Toast.LENGTH_SHORT).show()
         }
-    )
+    }
 
     LaunchedEffect(threadsUploadResult) {
         when (threadsUploadResult) {
@@ -195,11 +121,7 @@ fun AddThreadScreen(navController: NavHostController) {
 
             is NetworkResult.Success -> {
                 if (threadsUploadResult!!.data != null) {
-                    navController.navigate(Routes.Home.route) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
+                    navController.popBackStack()
                 }
                 isLoading = false
                 navController.navigate(Routes.Home.route) {
@@ -208,7 +130,6 @@ fun AddThreadScreen(navController: NavHostController) {
                     }
                 }
             }
-
             null -> {}
         }
     }
@@ -329,141 +250,21 @@ fun AddThreadScreen(navController: NavHostController) {
                             }
                         )
 
-                        if (imageUri == null && videoUri == null && audioUri == null) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        vertical = 3.dp,
-                                    ),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-
-                                IconButton(onClick = {
-
-                                    val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            permission
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    }
-                                    if (isGranted) {
-                                        launcher.launch("image/*")
-                                    } else {
-                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
-                                    }
-
-                                }) {
-
-                                    Icon(
-                                        imageVector = Icons.Outlined.PhotoLibrary,
-                                        contentDescription = "photo library"
-                                    )
-
-                                }
-                                IconButton(onClick = { /*TODO*/ }) {
-
-                                    Icon(
-                                        imageVector = Icons.Outlined.GifBox,
-                                        contentDescription = "gif"
-                                    )
-
-                                }
-                                IconButton(onClick = {
-                                    val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            permission
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    }
-                                    if (isGranted) {
-                                        audioLauncher.launch("audio/*")
-                                    } else {
-                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
-                                    }
-                                }) {
-
-                                    Icon(
-                                        imageVector = Icons.Outlined.Mic,
-                                        contentDescription = "mic"
-                                    )
-
-                                }
-                                IconButton(onClick = {
-                                    val isGranted = permissionToRequest.all { permission ->
-                                        ContextCompat.checkSelfPermission(
-                                            context,
-                                            permission
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    }
-                                    if (isGranted) {
-                                        videoLauncher.launch("video/*")
-                                    } else {
-                                        permissionLauncher.launch(permissionToRequest.toTypedArray())
-                                    }
-                                }) {
-
-                                    Icon(
-                                        imageVector = Icons.Outlined.Segment,
-                                        contentDescription = "library"
-                                    )
-                                }
-                            }
-                        }
-                        else if(videoUri != null){
-                            Box(
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .padding(end = 8.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .aspectRatio(1f)
-                                    .wrapContentHeight(),
-                            ) {
-                                Exoplayer(
-                                    uri = videoUri,
-                                    onRemove = {
-                                        videoUri = null
-                                    }
-                                )
-                            }
-                        }
-                        else {
-                            Box(
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .shadow(0.dp, shape = RoundedCornerShape(8.dp))
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .defaultMinSize(minHeight = 100.dp, minWidth = 1.dp)
-                                        .clip(RoundedCornerShape(5.dp)),
-                                    painter = rememberAsyncImagePainter(
-                                        model = ImageRequest.Builder(context)
-                                            .data(imageUri)
-                                            .size(Size.ORIGINAL)
-                                            .crossfade(true)
-                                            .build(),
-                                    ),
-                                    contentDescription = "thread image",
-                                    contentScale = ContentScale.Fit
-                                )
-
-                                IconButton(
-                                    modifier = Modifier.align(Alignment.TopEnd),
-                                    onClick = {
-                                        imageUri = null
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Cancel,
-                                        contentDescription = "Remove image",
-                                        tint = Color.LightGray
-                                    )
-                                }
-                            }
-                        }
+                        MediaSelector(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
+                            context = context,
+                            imageUri = imageUri,
+                            videoUri = videoUri,
+                            audioUri = audioUri,
+                            onImageSelected = { imageUri = it },
+                            onVideoSelected = { videoUri = it },
+                            onAudioSelected = { audioUri = it },
+                            permissions = permissions,
+                            imageLauncher = launcher,
+                            videoLauncher = videoLauncher,
+                            audioLauncher = audioLauncher,
+                            permissionLauncher = permissionLauncher
+                        )
 
                         Text(
                             modifier = Modifier.padding(top = 10.dp),
@@ -595,12 +396,4 @@ fun DropDown(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AddThreadsPreview() {
-
-//    AddThreadScreen()
-
 }

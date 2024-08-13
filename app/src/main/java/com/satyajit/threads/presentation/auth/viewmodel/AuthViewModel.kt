@@ -28,9 +28,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun register(username:String, email: String,password: String, imageUri: Uri?){
+    fun register(username:String, email: String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.registerWithEmail(username, email, password, imageUri)
+            repository.registerWithEmail(username, email, password)
         }
     }
 

@@ -17,10 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -49,6 +54,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,31 +82,37 @@ fun LoginScreen(navHostController: NavHostController) {
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
+
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(loginResult){
-        when(loginResult){
+    var showPassword by remember { mutableStateOf(value = false) }
+
+    LaunchedEffect(loginResult) {
+        when (loginResult) {
             is NetworkResult.Error -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(loginResult!!.message.toString())
                 }
                 isLoading = false
             }
+
             is NetworkResult.Loading -> {
                 isLoading = true
             }
+
             is NetworkResult.Success -> {
-                if(loginResult!!.data!=null){
+                if (loginResult!!.data != null) {
                     navHostController.navigate(Routes.SaveInfo.route) {
-                        popUpTo(navHostController.graph.id){
+                        popUpTo(navHostController.graph.id) {
                             inclusive = true
                         }
                     }
                 }
                 isLoading = false
             }
+
             null -> {}
-    }
+        }
     }
 
     val gradient = Brush.linearGradient(
@@ -182,7 +195,30 @@ fun LoginScreen(navHostController: NavHostController) {
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password
                 ),
+                visualTransformation = if (showPassword) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
                 singleLine = true,
+                trailingIcon = {
+                    if (showPassword) {
+                        IconButton(onClick = { showPassword = false }) {
+                            Icon(
+                                imageVector = Icons.Filled.Visibility,
+                                contentDescription = "hide_password"
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { showPassword = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.VisibilityOff,
+                                contentDescription = "hide_password"
+                            )
+                        }
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -196,19 +232,28 @@ fun LoginScreen(navHostController: NavHostController) {
                         var isValid = true
 
                         if (emailState.value.isBlank()) {
-                            Toast.makeText(context, "Please enter an email or mobile number", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Please enter an email or mobile number",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             isValid = false
-                        }else if(!isValidEmail(emailState.value)){
-                            Toast.makeText(context, "Please enter a valid email", Toast.LENGTH_SHORT).show()
+                        } else if (!isValidEmail(emailState.value)) {
+                            Toast.makeText(
+                                context,
+                                "Please enter a valid email",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             isValid = false
                         }
 
                         if (passwordState.value.isBlank()) {
-                            Toast.makeText(context, "Please enter a password", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please enter a password", Toast.LENGTH_SHORT)
+                                .show()
                             isValid = false
                         }
 
-                        if(isValid){
+                        if (isValid) {
                             authViewModel.login(emailState.value, passwordState.value)
                             isLoading = true
                         }
@@ -244,7 +289,7 @@ fun LoginScreen(navHostController: NavHostController) {
                 )
                 TextButton(onClick = {
                     navHostController.navigate(Routes.Register.route) {
-                        popUpTo(navHostController.graph.startDestinationId){
+                        popUpTo(navHostController.graph.startDestinationId) {
                             inclusive = true
                         }
                     }
@@ -274,7 +319,6 @@ fun LoginScreen(navHostController: NavHostController) {
             }
         }
     }
-
 }
 
 private fun isValidEmail(email: String): Boolean {

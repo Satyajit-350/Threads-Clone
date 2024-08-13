@@ -65,19 +65,18 @@ class AuthRepository @Inject constructor(
         username: String,
         email: String,
         password: String,
-        imageUri: Uri?
     ) {
         _registerResultLiveData.postValue(NetworkResult.Loading())
         try {
 
             var image_url: String?="https://firebasestorage.googleapis.com/v0/b/threads-501d6.appspot.com/o/UsersImage%2Fdefault_profile_img.jpg?alt=media&token=fd2abe60-8976-49f5-b644-16b1b43507f2"
-            if(imageUri!=null){
-                image_url = imageUri?.let {
-                    storageReference.child(
-                        "UsersImage/${UUID.randomUUID()}")
-                        .putFile(it).await().storage.downloadUrl.await().toString()
-                }
-            }
+//            if(imageUri!=null){
+//                image_url = imageUri?.let {
+//                    storageReference.child(
+//                        "UsersImage/${UUID.randomUUID()}")
+//                        .putFile(it).await().storage.downloadUrl.await().toString()
+//                }
+//            }
 
             val response = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             val user = response.user

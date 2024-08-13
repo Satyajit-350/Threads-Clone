@@ -1,17 +1,9 @@
 package com.satyajit.threads.presentation.auth.register
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,19 +15,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -50,22 +46,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
 import com.satyajit.threads.presentation.auth.viewmodel.AuthViewModel
 import com.satyajit.threads.utils.NetworkResult
-import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,36 +71,6 @@ fun RegisterScreen(
     val registerResult by authViewModel.registerResult.observeAsState(null)
 
     var isLoading by remember { mutableStateOf(false) }
-
-    val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
-
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(
-                context,
-                "Permission Not Granted!! Please grant permisssion",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     LaunchedEffect(registerResult) {
         when (registerResult) {
@@ -158,35 +120,14 @@ fun RegisterScreen(
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(50.dp))
-
         Image(
-            painter = if (imageUri == null) painterResource(id = R.drawable.instagram_logo)
-            else rememberAsyncImagePainter(model = imageUri),
+            painter = painterResource(id = R.drawable.instagram_logo),
             contentDescription = null,
             modifier = Modifier
                 .width(100.dp)
                 .height(100.dp)
                 .align(Alignment.CenterHorizontally)
-                .clickable {
-                    val isGranted = ContextCompat.checkSelfPermission(
-                        context, permissionToRequest
-                    ) == PackageManager.PERMISSION_GRANTED
-                    if (isGranted) {
-                        launcher.launch("image/*")
-                    } else {
-                        permissionLauncher.launch(permissionToRequest)
-                    }
-                }
         )
-
-//        Image(
-//            painter = painterResource(id = R.drawable.instagram_logo),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .width(100.dp)
-//                .height(100.dp)
-//                .align(Alignment.CenterHorizontally)
-//        )
 
         Spacer(modifier = Modifier.height(60.dp))
 
@@ -229,6 +170,8 @@ fun RegisterScreen(
 
         val passwordState = remember { mutableStateOf("") }
 
+        var showPassword by remember { mutableStateOf(value = false) }
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -242,6 +185,33 @@ fun RegisterScreen(
             },
             colors = TextFieldDefaults.textFieldColors(containerColor = Color.White),
             shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = if (showPassword) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            singleLine = true,
+            trailingIcon = {
+                if (showPassword) {
+                    IconButton(onClick = { showPassword = false }) {
+                        Icon(
+                            imageVector = Icons.Filled.Visibility,
+                            contentDescription = "hide_password"
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = { showPassword = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.VisibilityOff,
+                            contentDescription = "hide_password"
+                        )
+                    }
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -280,8 +250,7 @@ fun RegisterScreen(
                         authViewModel.register(
                             usernameState.value,
                             emailState.value,
-                            passwordState.value,
-                            imageUri
+                            passwordState.value
                         )
                         isLoading = true
                     }
@@ -352,9 +321,3 @@ private fun isValidEmail(email: String): Boolean {
     val emailPattern = Regex("[a-zA-Z0–9._-]+@[a-z]+\\.+[a-z]+")
     return emailPattern.matches(email)
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//private fun RegisterPreview() {
-//    RegisterScreen()
-//}

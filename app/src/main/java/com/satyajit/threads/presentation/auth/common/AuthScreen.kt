@@ -7,6 +7,9 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowInsets
 import android.view.WindowInsets.Type
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,19 +54,30 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.satyajit.threads.R
 import com.satyajit.threads.navigation.Routes
+import com.satyajit.threads.utils.PermissionManager
 
 @Composable
 fun AuthScreen(navHostController: NavHostController) {
 
-//    val systemUiController = rememberSystemUiController()
-//
-//    SideEffect {
-//        systemUiController.setStatusBarColor(
-//            color = Color(0x00FFFFFF),
-//            darkIcons = false
-//        )
-//    }
+    val context = LocalContext.current
+    val permissions = PermissionManager.getPermissionRequest()
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permission ->
+        val allGranted = permission.all { it.value }
+        if (allGranted) {
+            Toast.makeText(context, "All permissions granted.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Permissions Not Granted!! Please grant permissions", Toast.LENGTH_SHORT).show()
+        }
+    }
 
+    LaunchedEffect(Unit) {
+        val isGranted = PermissionManager.checkPermissionGranted(context, permissions)
+        if (isGranted) {
+            //Toast.makeText(context, "All permissions granted.", Toast.LENGTH_SHORT).show()
+        } else {
+            PermissionManager.requestPermissions(permissionLauncher, permissions)
+        }
+    }
     val gradient = Brush.linearGradient(
         0.0f to Color(0xFFFCD3E6),
         500.0f to Color(0xFFDAFBFF),
@@ -96,7 +111,7 @@ fun AuthScreen(navHostController: NavHostController) {
                     .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
                     .clickable {
                         navHostController.navigate(Routes.Login.route) {
-                            popUpTo(navHostController.graph.startDestinationId){
+                            popUpTo(navHostController.graph.startDestinationId) {
                                 inclusive = true
                             }
                         }
@@ -132,7 +147,7 @@ fun AuthScreen(navHostController: NavHostController) {
                     .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
                     .clickable {
                         navHostController.navigate(Routes.Register.route) {
-                            popUpTo(navHostController.graph.startDestinationId){
+                            popUpTo(navHostController.graph.startDestinationId) {
                                 inclusive = true
                             }
                         }
