@@ -9,9 +9,11 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -32,17 +34,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition{
             mainViewModel.isLoading.value
         }
-
         setContent {
             ThreadsTheme {
-//                val systemUiController = rememberSystemUiController()
-//
-//                SideEffect {
-//                    systemUiController.setStatusBarColor(
-//                        color = Color(0x00FFFFFF),
-//                        darkIcons = true
-//                    )
-//                }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -53,7 +46,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 return@OnCompleteListener
@@ -62,3 +54,5 @@ class MainActivity : ComponentActivity() {
         })
     }
 }
+
+

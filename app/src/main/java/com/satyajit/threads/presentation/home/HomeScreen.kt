@@ -1,14 +1,12 @@
 package com.satyajit.threads.presentation.home
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,10 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidPath
@@ -35,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.flatten
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.satyajit.threads.presentation.common.ThreadItems
@@ -43,7 +37,6 @@ import com.satyajit.threads.utils.AnimUtils.handleRefreshAnimation
 import com.satyajit.threads.utils.AnimUtils.rememberAnimationControllers
 import com.satyajit.threads.utils.AnimUtils.rememberAnimations
 import com.satyajit.threads.utils.GithubLogoPath
-import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterialApi::class)
@@ -53,7 +46,6 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val getAllThreadsResult = homeViewModel.getAllThreads.collectAsLazyPagingItems()
-    var isRefreshing by remember { mutableStateOf(false) }
     val path = remember {
         Path().apply { addPath(GithubLogoPath.scaledPath.asComposePath()) }
     }
@@ -79,9 +71,6 @@ fun HomeScreen(
 
     val hapticFeedback = LocalHapticFeedback.current
     handleRefreshAnimation(pullCompleted, scaleAnimationOnPullCompleted, hapticFeedback)
-//    handleLoadingState(getAllThreadsResult.loadState, isRefreshing = { refreshing ->
-//        isRefreshing = refreshing
-//    })
 
     LaunchedEffect(getAllThreadsResult.loadState.refresh) {
         val refreshState = getAllThreadsResult.loadState.refresh
@@ -95,51 +84,44 @@ fun HomeScreen(
             pathBackAndForthAnimationOnRefreshing.snapTo(0f)
         }
     }
-
     Box(modifier = Modifier
         .fillMaxSize()
         .pullRefresh(state = pullRefreshState)
     ){
-        LazyColumn(
-            state = rememberLazyListState(),
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    translationY = offsetYAnimation.dp.toPx()
-                },
-            contentPadding = PaddingValues(2.dp),
-        ) {
-            item {
-                ReloadAnim(
-                    modifier = Modifier.fillMaxWidth(),
-                    offsetYAnimation = offsetYAnimation,
-                    alphaAnimation = alphaAnimation,
-                    scaleAnimation = scaleAnimation,
-                    scaleAnimationOnPullCompleted = scaleAnimationOnPullCompleted,
-                    path = path,
-                    lines = lines,
-                    pullRefreshState = pullRefreshState,
-                    pathBackAndForthAnimationOnRefreshing = pathBackAndForthAnimationOnRefreshing,
-                )
-            }
-            items(count = getAllThreadsResult.itemCount) {
-                getAllThreadsResult[it]?.let { threadWithUserData ->
-                    ThreadItems(
-                        threadData = threadWithUserData,
-                        navHostController = navHostController
+        Column {
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        translationY = offsetYAnimation.dp.toPx()
+                    },
+                contentPadding = PaddingValues(2.dp),
+            ) {
+                item {
+                    ReloadAnim(
+                        modifier = Modifier.fillMaxWidth(),
+                        offsetYAnimation = offsetYAnimation,
+                        alphaAnimation = alphaAnimation,
+                        scaleAnimation = scaleAnimation,
+                        scaleAnimationOnPullCompleted = scaleAnimationOnPullCompleted,
+                        path = path,
+                        lines = lines,
+                        pullRefreshState = pullRefreshState,
+                        pathBackAndForthAnimationOnRefreshing = pathBackAndForthAnimationOnRefreshing,
                     )
                 }
+                items(count = getAllThreadsResult.itemCount) {
+                    getAllThreadsResult[it]?.let { threadWithUserData ->
+                        ThreadItems(
+                            threadData = threadWithUserData,
+                            navHostController = navHostController
+                        )
+                    }
+                }
             }
-        }
-    }
-}
 
-@Composable
-private fun handleLoadingState(
-    loadState: CombinedLoadStates, isRefreshing: (Boolean) -> Unit) {
-    LaunchedEffect(loadState) {
-        val refreshState = loadState.refresh
-        Log.d("LoadingState", "Refresh State: $refreshState")
-        isRefreshing(refreshState is LoadState.Loading)
+        }
+
     }
 }
