@@ -75,3 +75,15 @@ We welcome contributions from the community! If you'd like to contribute to this
 5. Open a **Pull Request** explaining your changes.
 
 
+## Acknowledgements 🙏
+
+- [Jetpack Compose](https://developer.android.com/jetpack/compose) - For providing a modern toolkit to build native UIs.
+- [Firebase](https://firebase.google.com/) - For backend services and cloud infrastructure.
+- [Kotlin](https://kotlinlang.org/) - For making Android development more enjoyable.
+
+## Show Your Support ⭐
+
+If you found this project helpful or inspiring, please give it a star! ⭐ It helps the project grow and reach more developers.
+
+[![GitHub stars](https://img.shields.io/github/stars/Satyajit-350/Threads-Clone.svg?style=social&label=Star)](https://github.com/Satyajit-350/Threads-Clone)
+
