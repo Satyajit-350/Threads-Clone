@@ -30,18 +30,16 @@ This application is a clone of the popular Threads app, developed entirely with 
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/splash.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/auth.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/register.png" height="400"/></td>
+    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/login.png" height="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/login.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/login_info.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/onboaarding1.png" height="400"/></td>
-  </tr>
-  <tr>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/public_private.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/followers.png" height="400"/></td>
-    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/home.png" height="400"/></td>
   </tr>
   <tr>
+    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/home.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/options.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/repost.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/no_internet.png" height="400"/></td>
@@ -50,20 +48,19 @@ This application is a clone of the popular Threads app, developed entirely with 
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/new_thread_notification.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/follow_notification.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/reply_preview_screen.png" height="400"/></td>
+    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/reply_screen.png" height="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/reply_screen.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/search.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/new_thread.png" height="400"/></td>
-  </tr>
-  <tr>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/notification.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/profile.png" height="400"/></td>
-    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/edit_profile.png" height="400"/></td>
   </tr>
   <tr>
+    <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/edit_profile.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/switch_account.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/privacy.png" height="400"/></td>
     <td><img src="https://github.com/Satyajit-350/Threads-Clone/blob/master/screenshots/settings.png" height="400"/></td>
   </tr>
 </table>
+
