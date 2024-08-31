@@ -365,7 +365,7 @@ private fun Header(
 
             Text(
                 text = "New thread",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Start
             )

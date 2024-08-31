@@ -30,10 +30,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.satyajit.threads.R
 import com.satyajit.threads.utils.PermissionManager
 
 @Composable
@@ -71,7 +73,7 @@ fun MediaSelector(
             }) {
 
                 Icon(
-                    imageVector = Icons.Outlined.PhotoLibrary,
+                    painter = painterResource(id = R.drawable.ic_images),
                     contentDescription = "photo library"
                 )
 
@@ -79,7 +81,7 @@ fun MediaSelector(
             IconButton(onClick = { /*TODO*/ }) {
 
                 Icon(
-                    imageVector = Icons.Outlined.GifBox,
+                    painter = painterResource(id = R.drawable.ic_gif),
                     contentDescription = "gif"
                 )
 
@@ -94,8 +96,23 @@ fun MediaSelector(
             }) {
 
                 Icon(
-                    imageVector = Icons.Outlined.Mic,
+                    painter = painterResource(id = R.drawable.ic_mic),
                     contentDescription = "mic"
+                )
+
+            }
+            IconButton(onClick = {
+                val isGranted = PermissionManager.checkPermissionGranted(context, permissions)
+                if (isGranted) {
+                    audioLauncher.launch("audio/*")
+                } else {
+                    PermissionManager.requestPermissions(permissionLauncher, permissions)
+                }
+            }) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_hashtag),
+                    contentDescription = "hashtag"
                 )
 
             }
@@ -109,7 +126,7 @@ fun MediaSelector(
             }) {
 
                 Icon(
-                    imageVector = Icons.Outlined.Segment,
+                    painter = painterResource(id = R.drawable.ic_menu),
                     contentDescription = "library"
                 )
             }
