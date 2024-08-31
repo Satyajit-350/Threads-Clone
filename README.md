@@ -64,3 +64,14 @@ This application is a clone of the popular Threads app, developed entirely with 
   </tr>
 </table>
 
+## How to Contribute 🤝
+
+We welcome contributions from the community! If you'd like to contribute to this project, follow these steps:
+
+1. **Fork** this repository.
+2. **Clone** your fork to your local machine.
+3. Create a new **branch** for your feature or bugfix.
+4. **Commit** your changes and push your branch to your fork.
+5. Open a **Pull Request** explaining your changes.
+
+
